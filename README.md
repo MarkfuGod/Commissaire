@@ -1,1 +1,6 @@
 # roguelikeDev
+
+- Tiled map editor: https://www.mapeditor.org/
+
+- Warrior Art by Luiz Melo: https://luizmelo.itch.io/medieval-kin...
+- Background Art by Trixie: https://trixelized.itch.io/starstring...
