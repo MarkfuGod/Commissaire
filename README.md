@@ -1,7 +1,12 @@
 # roguelikeDev
 
-- Tiled map editor: https://www.mapeditor.org/
+## Usage
 
+To run the game on server, use command `node server.js`(make sure you have installed *node* on your computer).
+
+## Dev resources
+
+- Tiled map editor: https://www.mapeditor.org/
 - Warrior Art by Luiz Melo: https://luizmelo.itch.io/medieval-kin...
 - Background Art by Trixie: https://trixelized.itch.io/starstring...
 
