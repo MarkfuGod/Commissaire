@@ -6,7 +6,7 @@ To run the game on server, use command:
 ```shell
 node server.js
 ```
-*make sure you have installed `node` on your computer*
+*Make sure you have installed `node` on your computer*
 
 ## Dev resources
 
