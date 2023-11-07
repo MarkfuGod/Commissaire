@@ -175,7 +175,7 @@ window.addEventListener('keydown', (event) => {
             keys.a.pressed = true
             break
         case 'w':
-            player.velocity.y = -3.5
+            player.try2Jump()
             console.log('what the fuck')
             break
     }

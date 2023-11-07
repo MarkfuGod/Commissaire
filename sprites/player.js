@@ -1,5 +1,5 @@
 import Sprite from "./sprite.js";
-import Collision from "../utils/collision.js";
+import CollisionCalculator from "../utils/CollisionCalculator.js";
 export default class Player extends Sprite {
 	constructor({
 		position,
@@ -10,6 +10,7 @@ export default class Player extends Sprite {
 		animations,
 	}) {
 		super({ imageSrc, frameRate, scale });
+		this.jumpingCount = 0;
 		this.position = position;
 		this.velocity = {
 			x: 0,
@@ -45,7 +46,19 @@ export default class Player extends Sprite {
 			height: 80,
 		};
 	}
-
+	try2Jump() {
+		if (this.jumpingCount == 2) {
+			return
+		} 
+		this.#jump()
+	}
+	#jump() {
+		this.velocity.y = -3.5
+		this.jumpingCount++;
+	}
+	#jumpResets() {
+		this.jumpingCount = 0;
+	}
 	switchSprite(key) {
 		if (this.image == this.animations[key].image || !this.loaded) return;
 
@@ -163,12 +176,12 @@ export default class Player extends Sprite {
 			const collisionBlock = this.collisionBlocks[i];
 
 			if (
-				Collision({
+				CollisionCalculator.hasCollision({
 					object1: this.hitbox,
 					object2: collisionBlock,
 				})
 			) {
-				if (this.velocity.x > 0) {
+				if (this.velocity.x >= 0) {
 					this.velocity.x = 0;
 					const offset =
 						this.hitbox.position.x - this.position.x + this.hitbox.width;
@@ -196,14 +209,14 @@ export default class Player extends Sprite {
 			const collisionBlock = this.collisionBlocks[i];
 
 			if (
-				Collision({
+				CollisionCalculator.hasCollision({
 					object1: this.hitbox,
 					object2: collisionBlock,
 				})
 			) {
-				if (this.velocity.y > 0) {
+				if (this.velocity.y >= 0) {
 					this.velocity.y = 0;
-
+					this.#jumpResets();
 					const offset =
 						this.hitbox.position.y - this.position.y + this.hitbox.height;
 
