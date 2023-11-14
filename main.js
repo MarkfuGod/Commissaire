@@ -95,6 +95,9 @@ const keys = {
     a: {
         pressed: false,
     },
+    w: {
+        pressed: false
+    }
 }
 
 const background = new Sprite({
@@ -175,9 +178,13 @@ window.addEventListener('keydown', (event) => {
             keys.a.pressed = true
             break
         case 'w':
-            player.velocity.y = -3.5
-            console.log('what the fuck')
+            if (!keys.w.pressed) {
+                keys.w.pressed = true
+                player.try2Jump()
+                console.log('what the fuck')
+            }
             break
+
     }
 })
 
@@ -188,6 +195,9 @@ window.addEventListener('keyup', (event) => {
             break
         case 'a':
             keys.a.pressed = false
+            break
+        case 'w':
+            keys.w.pressed = false
             break
     }
 })
