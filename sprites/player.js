@@ -1,6 +1,15 @@
 import Sprite from "./sprite.js";
 import CollisionCalculator from "../utils/CollisionCalculator.js";
 export default class Player extends Sprite {
+	/**
+	 * 玩家类
+	 * @param {object} position - 玩家的位置
+	 * @param {array} collisionBlocks - 碰撞块数组
+	 * @param {string} imageSrc - 玩家图像的路径
+	 * @param {number} frameRate - 玩家动画的帧率
+	 * @param {number} scale - 玩家的缩放比例
+	 * @param {object} animations - 玩家动画对象
+	 */
 	constructor({
 		position,
 		collisionBlocks,
@@ -46,27 +55,77 @@ export default class Player extends Sprite {
 			height: 80,
 		};
 	}
+
+	/**
+	 * 尝试跳跃
+	 */
 	try2Jump() {
 		if (this.jumpingCount == 2) {
-			return
-		} 
-		this.#jump()
+			return;
+		}
+		this.#jump();
 	}
+
+	/**
+	 * 攻击方法
+	 */
+	try2Attack(i) {
+		switch(i)
+		{
+			case 0:
+				this.attack1()
+				break
+			case 1:
+				this.attack2()
+				break
+			case 2:
+				this.attack3()
+				break
+		}
+		
+	}
+	attack1() {
+		//插入攻击1逻辑
+	}
+	attack2() {
+		//插入攻击2逻辑
+	}
+	attack3() {
+		//插入攻击3逻辑
+	}
+	/**
+	 * 跳跃方法
+	 */
 	#jump() {
-		this.velocity.y = -3.5
+		this.velocity.y = -3.5;
 		this.jumpingCount++;
 	}
+
+	/**
+	 * 跳跃重置方法
+	 */
 	#jumpResets() {
 		this.jumpingCount = 0;
 	}
+
+	/**
+	 * 切换精灵方法
+	 * @param {string} key - 精灵的键名
+	 */
 	switchSprite(key) {
-		if (this.image == this.animations[key].image || !this.loaded) return;
+		if (this.image == this.animations[key].image || !this.loaded) {
+			return;
+		}
 
 		this.image = this.animations[key].image;
 		this.frameBuffer = this.animations[key].frameBuffer;
 		this.frameRate = this.animations[key].frameRate;
+		
 	}
 
+	/**
+	 * 更新camerabox
+	 */
 	updateCamerabox() {
 		this.camerabox = {
 			position: {
@@ -78,15 +137,23 @@ export default class Player extends Sprite {
 		};
 	}
 
+	/**
+	 * 检查水平方向上的碰撞
+	 */
 	checkforHorizontalCanvasCollision() {
 		if (
 			this.hitbox.position.x + this.hitbox.width + this.velocity.x >= 576 ||
 			this.hitbox.position.x + this.velocity.x <= 0
 		) {
-			this.velocity.x = 0; // cannot pass the edge
+			this.velocity.x = 0; // 不能通过边缘
 		}
 	}
 
+	/**
+	 * 是否需要向左平移相机
+	 * @param {object} canvas - 画布对象
+	 * @param {object} camera - 相机对象
+	 */
 	shouldPanCameraToLeft({ canvas, camera }) {
 		const cameraboxRightSide = this.camerabox.position.x + this.camerabox.width;
 
@@ -97,6 +164,11 @@ export default class Player extends Sprite {
 		}
 	}
 
+	/**
+	 * 是否需要向右平移相机
+	 * @param {object} canvas - 画布对象
+	 * @param {object} camera - 相机对象
+	 */
 	shouldPanCameraToRight({ canvas, camera }) {
 		if (this.camerabox.position.x <= 0) return;
 		if (this.camerabox.position.x <= Math.abs(camera.position.x)) {
@@ -104,14 +176,24 @@ export default class Player extends Sprite {
 		}
 	}
 
+	/**
+	 * 是否需要向下平移相机
+	 * @param {object} canvas - 画布对象
+	 * @param {object} camera - 相机对象
+	 */
 	shouldPanCameraDown({ canvas, camera }) {
 		if (this.camerabox.position.y + this.velocity.y <= 0) return;
 
-		if (this.camerabox.position.y <= Math.abs(camera.position.y)) {
+		if (this.camerabox.position.y <= Math.abs(camera.position.y) + canvas.height / 4) {
 			camera.position.y -= this.velocity.y;
-			//cosnole.log('fuck')
 		}
 	}
+
+	/**
+	 * 是否需要向上平移相机
+	 * @param {object} canvas - 画布对象
+	 * @param {object} camera - 相机对象
+	 */
 	shouldPanCameraUp({ canvas, camera }) {
 		if (
 			this.camerabox.position.y + this.camerabox.height + this.velocity.y >=
@@ -124,10 +206,12 @@ export default class Player extends Sprite {
 			Math.abs(camera.position.y) + canvas.height / 4
 		) {
 			camera.position.y -= this.velocity.y;
-			//cosnole.log('fuck')
 		}
 	}
 
+	/**
+	 * 更新方法
+	 */
 	update() {
 		this.updateFrames();
 		this.updateHitbox();
@@ -140,7 +224,7 @@ export default class Player extends Sprite {
 		// 	this.camerabox.width,
 		// 	this.camerabox.height )
 
-		//draws the image
+		//绘制图像
 		c.fillStyle = "rgba(0, 255, 0, 0.2)";
 		c.fillRect(this.position.x, this.position.y, this.width, this.height);
 
@@ -151,16 +235,20 @@ export default class Player extends Sprite {
 			this.hitbox.width,
 			this.hitbox.height
 		);
-
+	
 		this.draw();
 
 		this.position.x += this.velocity.x;
 		this.updateHitbox();
-		this.checkForHorizontalCollisions(); //mind the sequence
+		this.checkForHorizontalCollisions(); //注意序列
 		this.applyGravity();
 		this.updateHitbox();
 		this.checkForVerticalCollisions();
 	}
+
+	/**
+	 * 更新hitbox
+	 */
 	updateHitbox() {
 		this.hitbox = {
 			position: {
@@ -171,6 +259,10 @@ export default class Player extends Sprite {
 			height: 27,
 		};
 	}
+
+	/**
+	 * 检查水平碰撞
+	 */
 	checkForHorizontalCollisions() {
 		for (let i = 0; i < this.collisionBlocks.length; i++) {
 			const collisionBlock = this.collisionBlocks[i];
@@ -185,25 +277,31 @@ export default class Player extends Sprite {
 					this.velocity.x = 0;
 					const offset =
 						this.hitbox.position.x - this.position.x + this.hitbox.width;
-					this.position.x = collisionBlock.position.x - offset - 0.01; // subtract the last one
+					this.position.x = collisionBlock.position.x - offset - 0.01; // 减去最后一个
 				}
 
 				if (this.velocity.x < 0) {
 					this.velocity.x = 0;
 
 					const offset = this.hitbox.position.x - this.position.x;
-
 					this.position.x =
-						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // add the last one
+						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // 加上最后一个
 				}
 			}
 		}
 	}
+
+	/**
+	 * 应用重力
+	 */
 	applyGravity() {
 		this.velocity.y += gravity;
 		this.position.y += this.velocity.y;
 	}
 
+	/**
+	 * 检查垂直碰撞
+	 */
 	checkForVerticalCollisions() {
 		for (let i = 0; i < this.collisionBlocks.length; i++) {
 			const collisionBlock = this.collisionBlocks[i];
@@ -220,7 +318,7 @@ export default class Player extends Sprite {
 					const offset =
 						this.hitbox.position.y - this.position.y + this.hitbox.height;
 
-					this.position.y = collisionBlock.position.y - offset - 0.01; // subtract the last one
+					this.position.y = collisionBlock.position.y - offset - 0.01; // 减去最后一个
 					break;
 				}
 
@@ -229,7 +327,7 @@ export default class Player extends Sprite {
 
 					const offset = this.hitbox.position.y - this.position.y;
 					this.position.y =
-						collisionBlock.position.y + collisionBlock.height - offset + 0.01; // add the last one
+						collisionBlock.position.y + collisionBlock.height - offset + 0.01; // 加上最后一个
 					break;
 				}
 			}
