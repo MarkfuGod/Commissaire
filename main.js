@@ -84,7 +84,21 @@ const player = new Player({
             frameRate: 2,
             frameBuffer: 3,
         },
-
+        Attack1: {
+            imageSrc: './assets/warrior/Attack1.png',
+            frameRate: 4,
+            frameBuffer: 5,
+        },
+        Attack2: {
+            imageSrc: './assets/warrior/Attack2.png',
+            frameRate: 4,
+            frameBuffer: 5,
+        },
+        Attack3: {
+            imageSrc: './assets/warrior/Attack3.png',
+            frameRate: 4,
+            frameBuffer: 5,
+        },
     },
 })
 
@@ -97,7 +111,16 @@ const keys = {
     },
     w: {
         pressed: false
-    }
+    },
+    j: {
+        pressed: false
+    },
+    k: {
+        pressed: false
+    },
+    i: {
+        pressed: false
+    },
 }
 
 const background = new Sprite({
@@ -116,6 +139,8 @@ const camera = {
         y: -backgroundImageHeight + scaledCanvas.height,
     },
 }
+
+
 function animate() {
     window.requestAnimationFrame(animate)
     c.fillStyle = 'white'
@@ -147,6 +172,30 @@ function animate() {
         player.lastDirection = 'left'
         player.shouldPanCameraToRight({ canvas, camera })
     }
+    else if(keys.j.pressed)
+    {
+        player.switchSprite('Attack1')
+        console.log(player.currentFrame)
+        player.lastDirection = 'right'
+        if(player.currentFrame == 3)
+            keys.j.pressed = false
+    }
+    else if(keys.k.pressed)
+    {
+        player.switchSprite('Attack2')
+        console.log(player.currentFrame)
+        player.lastDirection = 'right'
+        if(player.currentFrame == 3)
+            keys.k.pressed = false
+    }
+    else if(keys.i.pressed)
+    {
+        player.switchSprite('Attack3')
+        console.log(player.currentFrame)
+        player.lastDirection = 'right'
+        if(player.currentFrame == 3)
+            keys.i.pressed = false
+    }
     else if (player.velocity.y == 0) {
         if (player.lastDirection == 'right') player.switchSprite('Idle')
         else player.switchSprite('IdleLeft')
@@ -169,6 +218,7 @@ function animate() {
 
 animate()
 
+
 window.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'd':
@@ -182,6 +232,30 @@ window.addEventListener('keydown', (event) => {
                 keys.w.pressed = true
                 player.try2Jump()
                 console.log('what the fuck')
+            }
+            break
+        case 'j':
+        //攻击1
+            if (!keys.j.pressed) {
+                keys.j.pressed = true
+                player.try2Attack(0)
+                console.log('attack1!')
+            }
+            break
+        case 'k':
+            if (!keys.k.pressed) {
+                keys.k.pressed = true
+                player.try2Attack(1)
+                console.log('attack2!')
+            
+                console.log(player.currentAnimationName)
+            }
+            break
+        case 'i':
+            if (!keys.i.pressed) {
+                keys.i.pressed = true
+                player.try2Attack(2)
+                console.log('attack3!')
             }
             break
 
@@ -201,5 +275,3 @@ window.addEventListener('keyup', (event) => {
             break
     }
 })
-
-
