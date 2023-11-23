@@ -1,4 +1,9 @@
 export default class Launcher {
+    /**
+     *
+     * @param fps the custom game speed
+     * @param animateFunc the drawing function
+     */
     static launchGame(fps, animateFunc) {
 
         let fpsInterval, startTime, now, then, elapsed;
