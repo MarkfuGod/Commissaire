@@ -1,6 +1,7 @@
 import CollisionBlock from "./utils/CollisionBlock.js"
 import Player from "./sprites/player.js"
 import Sprite from "./sprites/sprite.js"
+import Launcher from "./utils/Launcher.js";
 canvas.width = 1024
 canvas.height = 576
 
@@ -142,7 +143,6 @@ const camera = {
 
 
 function animate() {
-    window.requestAnimationFrame(animate)
     c.fillStyle = 'white'
     c.fillRect(0, 0, canvas.width, canvas.height)
     //player.draw()
@@ -216,7 +216,7 @@ function animate() {
     /*----------------------*/
 }
 
-animate()
+Launcher.launchGame(60, animate)
 
 
 window.addEventListener('keydown', (event) => {
