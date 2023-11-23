@@ -90,6 +90,7 @@ const player = new Player({
             frameRate: 4,
             frameBuffer: 5,
         },
+
         Attack2_right: {
             imageSrc: './assets/warrior/Attack2.png',
             frameRate: 4,
@@ -198,9 +199,9 @@ const enemy = new Enemy({
             frameRate: 4,
             frameBuffer: 5,
         },
+
     },
 })
-
 const keys = {
     d: {
         pressed: false,
@@ -283,11 +284,13 @@ function animate() {
             player.switchSprite('Attack1_left')
             player.lastDirection = 'left'
         }
+
         if(player.currentFrame == 3)
             keys.j.pressed = false
     }
     else if(keys.k.pressed)
     {
+
         if(player.lastDirection == 'right')
         {
             player.switchSprite('Attack2_right')
@@ -313,6 +316,7 @@ function animate() {
             player.switchSprite('Attack3_left')
             player.lastDirection = 'left'
         }
+
         if(player.currentFrame == 3)
             keys.i.pressed = false
     }

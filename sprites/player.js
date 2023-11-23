@@ -12,6 +12,7 @@ export default class Player extends Sprite {
 	 * @param {int} HP_limit - 玩家的最大生命值
 	 * @param {int} HP - 玩家的生命值
 	 * @param {int} damage - 玩家的攻击力
+
 	 */
 	constructor({
 		position,
@@ -62,7 +63,6 @@ export default class Player extends Sprite {
 		this.damage = 10;
 	}
 
-
 	/*玩家属性组方法 */
 	get_HP_limit() {
 		return this.HP_limit;
@@ -82,6 +82,7 @@ export default class Player extends Sprite {
 	set_damage(value) {
 		this.damage = value;
 	}
+
 	/**
 	 * 尝试跳跃
 	 */
@@ -109,6 +110,7 @@ export default class Player extends Sprite {
 				break
 		}
 		
+
 	}
 	attack1() {
 		//插入攻击1逻辑
