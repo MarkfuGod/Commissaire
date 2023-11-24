@@ -2,11 +2,21 @@
 
 ## Usage
 
-To run the game on server, use command:
-```shell
-node server.js
-```
-*Make sure you have installed `node` on your computer*
+1. Make sure you have installed [**node.js**](https://nodejs.org/en) on your environment
+2. Install dependency: On project root, run
+
+    ```shell
+    npm install
+    ```
+3. Run the server
+   1. You can use *node* to run the server
+       ```shell
+       node server.js
+       ```
+   2. Or you can use *nodemon* which supports **hot reload**
+       ```shell
+       nodemon server.js
+       ```
 
 ## Dev resources
 
