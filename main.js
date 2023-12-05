@@ -2,6 +2,8 @@ import CollisionBlock from "./utils/CollisionBlock.js"
 import Player from "./sprites/player.js"
 import Enemy from "./sprites/enemy.js"
 import Sprite from "./sprites/sprite.js"
+import KeyStatesConsumer from "./utils/KeyStatesConsumer.js";
+
 canvas.width = 1024
 canvas.height = 576
 
@@ -19,7 +21,7 @@ for (let i = 0; i < floorCollisions.length; i += 48) {
 const collisionBlocks = []
 floorCollisions2D.forEach((row, y) => {
     row.forEach((symbol, x) => {
-        if (symbol == 1729) {
+        if (symbol === 1729) {
             //console.log('fuck you')
             collisionBlocks.push(
                 new CollisionBlock({
@@ -240,9 +242,67 @@ const camera = {
     },
 }
 
+KeyStatesConsumer.registerKeyStates(keys)
+
+function registerKeyHandlers() {
+    KeyStatesConsumer
+        .registerConsumer("d", () => {
+            player.switchSprite('Run')
+            player.velocity.x = 2
+            player.lastDirection = 'right'
+            player.shouldPanCameraToLeft({canvas, camera})
+        }, false)
+        .registerConsumer("a", () => {
+            player.switchSprite('RunLeft')
+            player.velocity.x = -2
+            player.lastDirection = 'left'
+            player.shouldPanCameraToRight({canvas, camera})
+        }, false)
+        .registerConsumer("j", () => {
+            if (player.lastDirection === 'right') {
+                player.switchSprite('Attack1_right')
+                player.lastDirection = 'right'
+            } else {
+                player.switchSprite('Attack1_left')
+                player.lastDirection = 'left'
+            }
+            if (player.currentFrame === 3)
+                keys.j.pressed = false
+        }, false)
+        .registerConsumer("k", () => {
+            if (player.lastDirection === 'right') {
+                player.switchSprite('Attack2_right')
+                player.lastDirection = 'right'
+            } else {
+                player.switchSprite('Attack2_left')
+                player.lastDirection = 'left'
+            }
+            if (player.currentFrame === 3)
+                keys.k.pressed = false
+        }, false)
+        .registerConsumer("i", () => {
+            if (player.lastDirection === 'right') {
+                player.switchSprite('Attack3_right')
+                player.lastDirection = 'right'
+            } else {
+                player.switchSprite('Attack3_left')
+                player.lastDirection = 'left'
+            }
+
+            if (player.currentFrame === 3)
+                keys.i.pressed = false
+        }, false)
+        .registerConsumer("", () => {
+            if (player.velocity.y === 0) {
+                if (player.lastDirection === 'right') player.switchSprite('Idle')
+                else player.switchSprite('IdleLeft')
+            }
+        }, true)
+}
 
 function animate() {
     window.requestAnimationFrame(animate)
+    KeyStatesConsumer.consumes();
     c.fillStyle = 'white'
     c.fillRect(0, 0, canvas.width, canvas.height)
     //player.draw()
@@ -259,80 +319,15 @@ function animate() {
     player.update()
 
     player.velocity.x = 0
-    if (keys.d.pressed) {
-        player.switchSprite('Run')
-        player.velocity.x = 2
-        player.lastDirection = 'right'
-        player.shouldPanCameraToLeft({ canvas, camera })
-    }
 
-    else if (keys.a.pressed) {
-        player.switchSprite('RunLeft')
-        player.velocity.x = -2
-        player.lastDirection = 'left'
-        player.shouldPanCameraToRight({ canvas, camera })
-    }
-    else if(keys.j.pressed)
-    {
-        if(player.lastDirection == 'right')
-        {
-            player.switchSprite('Attack1_right')
-            player.lastDirection = 'right'
-        }
-        else
-        {
-            player.switchSprite('Attack1_left')
-            player.lastDirection = 'left'
-        }
-
-        if(player.currentFrame == 3)
-            keys.j.pressed = false
-    }
-    else if(keys.k.pressed)
-    {
-
-        if(player.lastDirection == 'right')
-        {
-            player.switchSprite('Attack2_right')
-            player.lastDirection = 'right'
-        }
-        else
-        {
-            player.switchSprite('Attack2_left')
-            player.lastDirection = 'left'
-        }
-        if(player.currentFrame == 3)
-            keys.k.pressed = false
-    }
-    else if(keys.i.pressed)
-    {
-        if(player.lastDirection == 'right')
-        {
-            player.switchSprite('Attack3_right')
-            player.lastDirection = 'right'
-        }
-        else
-        {
-            player.switchSprite('Attack3_left')
-            player.lastDirection = 'left'
-        }
-
-        if(player.currentFrame == 3)
-            keys.i.pressed = false
-    }
-    else if (player.velocity.y == 0) {
-        if (player.lastDirection == 'right') player.switchSprite('Idle')
-        else player.switchSprite('IdleLeft')
-    }
 
     if (player.velocity.y < 0) {
-        player.shouldPanCameraDown({ camera, canvas })
-        if (player.lastDirection == 'right') player.switchSprite('Jump')
+        player.shouldPanCameraDown({camera, canvas})
+        if (player.lastDirection === 'right') player.switchSprite('Jump')
         else player.switchSprite('JumpLeft')
-    }
-    else if (player.velocity.y > 0) {
-        player.shouldPanCameraUp({ camera, canvas })
-        if (player.lastDirection == 'right') player.switchSprite('Fall')
+    } else if (player.velocity.y > 0) {
+        player.shouldPanCameraUp({camera, canvas})
+        if (player.lastDirection === 'right') player.switchSprite('Fall')
         else player.switchSprite('FallLeft')
     }
     enemy.checkforHorizontalCanvasCollision()
@@ -340,7 +335,7 @@ function animate() {
     c.restore()
     /*----------------------*/
 }
-
+registerKeyHandlers();
 animate()
 
 
@@ -360,7 +355,7 @@ window.addEventListener('keydown', (event) => {
             }
             break
         case 'j':
-        //攻击1
+            //攻击1
             if (!keys.j.pressed) {
                 keys.j.pressed = true
                 player.try2Attack(0)
@@ -372,7 +367,7 @@ window.addEventListener('keydown', (event) => {
                 keys.k.pressed = true
                 player.try2Attack(1)
                 console.log('attack2!')
-            
+
                 console.log(player.currentAnimationName)
             }
             break
