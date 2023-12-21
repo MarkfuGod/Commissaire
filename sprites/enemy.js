@@ -1,18 +1,17 @@
 import Sprite from "./sprite.js";
 import CollisionCalculator from "../utils/CollisionCalculator.js";
-export default class Player extends Sprite {
+export default class Enemy extends Sprite {
 	/**
-	 * çŽ©å®¶ç±»
-	 * @param {object} position - çŽ©å®¶çš„ä½ç½®
-	 * @param {array} collisionBlocks - ç¢°æ’žå—æ•°ç»„
-	 * @param {string} imageSrc - çŽ©å®¶å›¾åƒçš„è·¯å¾„
-	 * @param {number} frameRate - çŽ©å®¶åŠ¨ç”»çš„å¸§çŽ‡
-	 * @param {number} scale - çŽ©å®¶çš„ç¼©æ”¾æ¯”ä¾‹
-	 * @param {object} animations - çŽ©å®¶åŠ¨ç”»å¯¹è±¡
-	 * @param {int} HP_limit - çŽ©å®¶çš„æœ€å¤§ç”Ÿå‘½å€¼
-	 * @param {int} HP - çŽ©å®¶çš„ç”Ÿå‘½å€¼
-	 * @param {int} damage - çŽ©å®¶çš„æ”»å‡»åŠ›
-
+	 * µÐÈËÀà
+	 * @param {object} position - µÐÈËµÄÎ»ÖÃ
+	 * @param {array} collisionBlocks - Åö×²¿éÊý×é
+	 * @param {string} imageSrc - µÐÈËÍ¼ÏñµÄÂ·¾¶
+	 * @param {number} frameRate - µÐÈË¶¯»­µÄÖ¡ÂÊ
+	 * @param {number} scale - µÐÈËµÄËõ·Å±ÈÀý
+	 * @param {object} animations - µÐÈË¶¯»­¶ÔÏó
+	 * @param {int} HP_limit - µÐÈËµÄ×î´óÉúÃüÖµ
+	 * @param {int} HP - µÐÈËµÄÉúÃüÖµ
+	 * @param {int} damage - µÐÈËµÄ¹¥»÷Á¦
 	 */
 	constructor({
 		position,
@@ -41,7 +40,7 @@ export default class Player extends Sprite {
 		};
 
 		this.animations = animations;
-		this.lastDirection = "right";
+		this.lastDirection = 'left';
 
 		for (let key in this.animations) {
 			const image = new Image();
@@ -60,10 +59,11 @@ export default class Player extends Sprite {
 		};
 		this.HP_limit = 100;
 		this.HP = this.HP_limit;
-		this.damage = 10;
+		this.damage = 5;
 	}
 
-	/*çŽ©å®¶å±žæ€§ç»„æ–¹æ³• */
+
+	/*µÐÈËÊôÐÔ×é·½·¨ */
 	get_HP_limit() {
 		return this.HP_limit;
 	}
@@ -82,9 +82,8 @@ export default class Player extends Sprite {
 	set_damage(value) {
 		this.damage = value;
 	}
-
 	/**
-	 * å°è¯•è·³è·ƒ
+	 * ³¢ÊÔÌøÔ¾
 	 */
 	try2Jump() {
 		if (this.jumpingCount == 2) {
@@ -94,54 +93,34 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ”»å‡»æ–¹æ³•
+	 * ¹¥»÷·½·¨
 	 */
-	try2Attack(i) {
-		switch(i)
-		{
-			case 0:
-				this.attack1()
-				break
-			case 1:
-				this.attack2()
-				break
-			case 2:
-				this.attack3()
-				break
-		}
-		
-
+	
+	attack() {
+		//²åÈë¹¥»÷Âß¼­
 	}
-	attack1() {
-		//æ’å…¥æ”»å‡»1é€»è¾‘
-	}
-	attack2() {
-		//æ’å…¥æ”»å‡»2é€»è¾‘
-	}
-	attack3() {
-		//æ’å…¥æ”»å‡»3é€»è¾‘
-	}
+	
 	/**
-	 * è·³è·ƒæ–¹æ³•
+	 * ÌøÔ¾·½·¨
 	 */
 	#jump() {
-		this.velocity.y = -3.5;
+		this.velocity.y = -1.5;
 		this.jumpingCount++;
 	}
 
 	/**
-	 * è·³è·ƒé‡ç½®æ–¹æ³•
+	 * ÌøÔ¾ÖØÖÃ·½·¨
 	 */
 	#jumpResets() {
 		this.jumpingCount = 0;
 	}
 
 	/**
-	 * åˆ‡æ¢ç²¾çµæ–¹æ³•
-	 * @param {string} key - ç²¾çµçš„é”®å
+	 * ÇÐ»»¾«Áé·½·¨
+	 * @param {string} key - ¾«ÁéµÄ¼üÃû
 	 */
 	switchSprite(key) {
-		if (this.image === this.animations[key].image || !this.loaded) {
+		if (this.image == this.animations[key].image || !this.loaded) {
 			return;
 		}
 
@@ -152,7 +131,7 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ›´æ–°camerabox
+	 * ¸üÐÂcamerabox
 	 */
 	updateCamerabox() {
 		this.camerabox = {
@@ -166,21 +145,21 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ£€æŸ¥æ°´å¹³æ–¹å‘ä¸Šçš„ç¢°æ’ž
+	 * ¼ì²éË®Æ½·½ÏòÉÏµÄÅö×²
 	 */
 	checkforHorizontalCanvasCollision() {
 		if (
 			this.hitbox.position.x + this.hitbox.width + this.velocity.x >= 576 ||
 			this.hitbox.position.x + this.velocity.x <= 0
 		) {
-			this.velocity.x = 0; // ä¸èƒ½é€šè¿‡è¾¹ç¼˜
+			this.velocity.x = 0; // ²»ÄÜÍ¨¹ý±ßÔµ
 		}
 	}
 
 	/**
-	 * æ˜¯å¦éœ€è¦å‘å·¦å¹³ç§»ç›¸æœº
-	 * @param {object} canvas - ç”»å¸ƒå¯¹è±¡
-	 * @param {object} camera - ç›¸æœºå¯¹è±¡
+	 * ÊÇ·ñÐèÒªÏò×óÆ½ÒÆÏà»ú
+	 * @param {object} canvas - »­²¼¶ÔÏó
+	 * @param {object} camera - Ïà»ú¶ÔÏó
 	 */
 	shouldPanCameraToLeft({ canvas, camera }) {
 		const cameraboxRightSide = this.camerabox.position.x + this.camerabox.width;
@@ -193,9 +172,9 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ˜¯å¦éœ€è¦å‘å³å¹³ç§»ç›¸æœº
-	 * @param {object} canvas - ç”»å¸ƒå¯¹è±¡
-	 * @param {object} camera - ç›¸æœºå¯¹è±¡
+	 * ÊÇ·ñÐèÒªÏòÓÒÆ½ÒÆÏà»ú
+	 * @param {object} canvas - »­²¼¶ÔÏó
+	 * @param {object} camera - Ïà»ú¶ÔÏó
 	 */
 	shouldPanCameraToRight({ canvas, camera }) {
 		if (this.camerabox.position.x <= 0) return;
@@ -205,9 +184,9 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ˜¯å¦éœ€è¦å‘ä¸‹å¹³ç§»ç›¸æœº
-	 * @param {object} canvas - ç”»å¸ƒå¯¹è±¡
-	 * @param {object} camera - ç›¸æœºå¯¹è±¡
+	 * ÊÇ·ñÐèÒªÏòÏÂÆ½ÒÆÏà»ú
+	 * @param {object} canvas - »­²¼¶ÔÏó
+	 * @param {object} camera - Ïà»ú¶ÔÏó
 	 */
 	shouldPanCameraDown({ canvas, camera }) {
 		if (this.camerabox.position.y + this.velocity.y <= 0) return;
@@ -218,9 +197,9 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ˜¯å¦éœ€è¦å‘ä¸Šå¹³ç§»ç›¸æœº
-	 * @param {object} canvas - ç”»å¸ƒå¯¹è±¡
-	 * @param {object} camera - ç›¸æœºå¯¹è±¡
+	 * ÊÇ·ñÐèÒªÏòÉÏÆ½ÒÆÏà»ú
+	 * @param {object} canvas - »­²¼¶ÔÏó
+	 * @param {object} camera - Ïà»ú¶ÔÏó
 	 */
 	shouldPanCameraUp({ canvas, camera }) {
 		if (
@@ -238,7 +217,7 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ›´æ–°æ–¹æ³•
+	 * ¸üÐÂ·½·¨
 	 */
 	update() {
 		this.updateFrames();
@@ -252,25 +231,10 @@ export default class Player extends Sprite {
 		// 	this.camerabox.width,
 		// 	this.camerabox.height )
 
-		//ç»˜åˆ¶å›¾åƒ
-		this.#drawHelperRectangle();
+		//»æÖÆÍ¼Ïñ
+		c.fillStyle = "rgba(0, 255, 0, 0.2)";
+		c.fillRect(this.position.x, this.position.y, this.width, this.height);
 
-		this.draw();
-
-		this.position.x += this.velocity.x;
-		this.updateHitbox();
-		this.checkForHorizontalCollisions(); //æ³¨æ„åºåˆ—
-		this.applyGravity();
-		this.updateHitbox();
-		this.checkForVerticalCollisions();
-	}
-
-	#drawHelperRectangle() {
-		this.#drawAttackRange();
-		this.#drawHitboxRange();
-	}
-
-	#drawHitboxRange() {
 		c.fillStyle = "rgba(255, 0, 0, 0.2)";
 		c.fillRect(
 			this.hitbox.position.x,
@@ -278,15 +242,19 @@ export default class Player extends Sprite {
 			this.hitbox.width,
 			this.hitbox.height
 		);
-	}
+	
+		this.draw();
 
-	#drawAttackRange() {
-		c.fillStyle = "rgba(0, 255, 0, 0.2)";
-		c.fillRect(this.position.x, this.position.y, this.width, this.height);
+		this.position.x += this.velocity.x;
+		this.updateHitbox();
+		this.checkForHorizontalCollisions(); //×¢ÒâÐòÁÐ
+		this.applyGravity();
+		this.updateHitbox();
+		this.checkForVerticalCollisions();
 	}
 
 	/**
-	 * æ›´æ–°hitbox
+	 * ¸üÐÂhitbox
 	 */
 	updateHitbox() {
 		this.hitbox = {
@@ -300,7 +268,7 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ£€æŸ¥æ°´å¹³ç¢°æ’ž
+	 * ¼ì²éË®Æ½Åö×²
 	 */
 	checkForHorizontalCollisions() {
 		for (let i = 0; i < this.collisionBlocks.length; i++) {
@@ -316,7 +284,7 @@ export default class Player extends Sprite {
 					this.velocity.x = 0;
 					const offset =
 						this.hitbox.position.x - this.position.x + this.hitbox.width;
-					this.position.x = collisionBlock.position.x - offset - 0.01; // å‡åŽ»æœ€åŽä¸€ä¸ª
+					this.position.x = collisionBlock.position.x - offset - 0.01; // ¼õÈ¥×îºóÒ»¸ö
 				}
 
 				if (this.velocity.x < 0) {
@@ -324,14 +292,14 @@ export default class Player extends Sprite {
 
 					const offset = this.hitbox.position.x - this.position.x;
 					this.position.x =
-						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // åŠ ä¸Šæœ€åŽä¸€ä¸ª
+						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // ¼ÓÉÏ×îºóÒ»¸ö
 				}
 			}
 		}
 	}
 
 	/**
-	 * åº”ç”¨é‡åŠ›
+	 * Ó¦ÓÃÖØÁ¦
 	 */
 	applyGravity() {
 		this.velocity.y += gravity;
@@ -339,7 +307,7 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * æ£€æŸ¥åž‚ç›´ç¢°æ’ž
+	 * ¼ì²é´¹Ö±Åö×²
 	 */
 	checkForVerticalCollisions() {
 		for (let i = 0; i < this.collisionBlocks.length; i++) {
@@ -357,7 +325,7 @@ export default class Player extends Sprite {
 					const offset =
 						this.hitbox.position.y - this.position.y + this.hitbox.height;
 
-					this.position.y = collisionBlock.position.y - offset - 0.01; // å‡åŽ»æœ€åŽä¸€ä¸ª
+					this.position.y = collisionBlock.position.y - offset - 0.01; // ¼õÈ¥×îºóÒ»¸ö
 					break;
 				}
 
@@ -366,7 +334,7 @@ export default class Player extends Sprite {
 
 					const offset = this.hitbox.position.y - this.position.y;
 					this.position.y =
-						collisionBlock.position.y + collisionBlock.height - offset + 0.01; // åŠ ä¸Šæœ€åŽä¸€ä¸ª
+						collisionBlock.position.y + collisionBlock.height - offset + 0.01; // ¼ÓÉÏ×îºóÒ»¸ö
 					break;
 				}
 			}
