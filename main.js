@@ -34,7 +34,8 @@ floorCollisions2D.forEach((row, y) => {
 })
 
 console.log(collisionBlocks)
-
+//敌人列表
+const enemyList = []
 
 const player = new Player({
     position: {
@@ -90,7 +91,6 @@ const player = new Player({
             frameRate: 4,
             frameBuffer: 5,
         },
-
         Attack2_right: {
             imageSrc: './assets/warrior/Attack2.png',
             frameRate: 4,
@@ -116,6 +116,26 @@ const player = new Player({
             frameRate: 4,
             frameBuffer: 5,
         },
+        TakeHit_right: {
+            imageSrc: './assets/warrior/TakeHit.png',
+            frameRate: 4,
+            frameBuffer: 6,
+        },
+        TakeHit_left: {
+            imageSrc: './assets/warrior/TakeHitMirror.png',
+            frameRate: 4,
+            frameBuffer: 5,
+        },
+        Death:{
+            imageSrc: './assets/warrior/Death.png',
+            frameRate: 6,
+            frameBuffer: 5,
+        },
+        DeathMirror:{
+            imageSrc: './assets/warrior/DeathMirror.png',
+            frameRate: 6,
+            frameBuffer: 5,
+        },
     },
 })
 
@@ -126,7 +146,7 @@ const enemy = new Enemy({
         y: 300,
     },
     collisionBlocks: collisionBlocks,
-    imageSrc: './assets/enemys/EVil Wizard 2/Idle(1).png',
+    imageSrc: './assets/enemys/EVil Wizard 2/Idle.png',
     frameRate: 8,
     animations: {
         Idle: {
@@ -171,37 +191,51 @@ const enemy = new Enemy({
         },
         Attack1_right: {
             imageSrc: './assets/enemys/EVil Wizard 2/Attack1.png',
-            frameRate: 4,
+            frameRate: 8,
             frameBuffer: 5,
         },
         Attack2_right: {
             imageSrc: './assets/enemys/EVil Wizard 2/Attack2.png',
-            frameRate: 4,
+            frameRate: 8,
             frameBuffer: 5,
         },
-        Attack3_right: {
-            imageSrc: './assets/enemys/EVil Wizard 2/Attack3.png',
-            frameRate: 4,
-            frameBuffer: 5,
-        },
+        
         Attack1_left: {
             imageSrc: './assets/enemys/EVil Wizard 2/Attack1Mirror.png',
-            frameRate: 4,
+            frameRate: 8,
             frameBuffer: 5,
         },
         Attack2_left: {
             imageSrc: './assets/enemys/EVil Wizard 2/Attack2Mirror.png',
-            frameRate: 4,
+            frameRate: 8,
             frameBuffer: 5,
         },
-        Attack3_left: {
-            imageSrc: './assets/enemys/EVil Wizard 2/Attack3Mirror.png',
-            frameRate: 4,
-            frameBuffer: 5,
+        TakeHit_right: {
+            imageSrc: './assets/enemys/EVil Wizard 2/TakeHit.png',
+            frameRate: 3,
+            frameBuffer: 4,
         },
-
+        TakeHit_left: {
+            imageSrc: './assets/enemys/EVil Wizard 2/TakeHitMirror.png',
+            frameRate: 3,
+            frameBuffer: 4,
+        },
+        Death: {
+            imageSrc: './assets/enemys/EVil Wizard 2/Death.png',
+            frameRate: 7,
+            frameBuffer: 8,
+        },
+        DeathMirror: {
+            imageSrc: './assets/enemys/EVil Wizard 2/DeathMirror.png',
+            frameRate: 7,
+            frameBuffer: 8,
+        },
     },
 })
+
+
+
+
 const keys = {
     d: {
         pressed: false,
@@ -284,13 +318,11 @@ function animate() {
             player.switchSprite('Attack1_left')
             player.lastDirection = 'left'
         }
-
         if(player.currentFrame == 3)
             keys.j.pressed = false
     }
     else if(keys.k.pressed)
     {
-
         if(player.lastDirection == 'right')
         {
             player.switchSprite('Attack2_right')
@@ -316,7 +348,6 @@ function animate() {
             player.switchSprite('Attack3_left')
             player.lastDirection = 'left'
         }
-
         if(player.currentFrame == 3)
             keys.i.pressed = false
     }
@@ -335,8 +366,68 @@ function animate() {
         if (player.lastDirection == 'right') player.switchSprite('Fall')
         else player.switchSprite('FallLeft')
     }
-    enemy.checkforHorizontalCanvasCollision()
-    enemy.update()
+    if(player.HP == 0)
+    {
+        console.log(player.HP)
+        if(!player.isDead)
+        {
+            if(player.lastDirection == 'right')
+                player.switchSprite('Death')
+            else
+                player.switchSprite('DeathMirror')
+        }
+        setTimeout(() => {
+            player.isDead = true
+        }, 500);
+        
+    }
+    if(player.isDead)
+    {
+        background.image.src = './assets/img/gameover.png'
+        camera.position = {x:0,y:0}
+        background.update()
+    }
+    enemyList.push(enemy)
+    player.getEnemies(enemyList)
+    
+    if(enemy.HP > 0)
+    {
+        enemy.checkforHorizontalCanvasCollision()
+        enemy.enemy_AI(player.position,player)
+        //检查敌人血量是否发生变化，若减少则播放受击动画
+        if(enemy.HP < enemy.preHP)
+        {
+            enemy.behurt = false
+            enemy.preHP = enemy.HP
+        }
+        if(!enemy.behurt)
+        {
+            if(enemy.lastDirection == 'right')
+                enemy.switchSprite('TakeHit_right')
+            else
+                enemy.switchSprite('TakeHit_left')
+            setTimeout(() => {
+                enemy.behurt = true
+            }, 200);
+        }
+            
+        //console.log(enemy.showDead)
+    }
+    else
+    {
+        if(enemy.showDead)
+        {
+            if(enemy.lastDirection == 'right')
+                enemy.switchSprite('Death')
+            else
+                enemy.switchSprite('DeathMirror')
+            setTimeout(() => {
+                enemy.showDead = false
+            }, 680);
+        }
+    }
+    if(enemy.showDead)
+            enemy.update() 
     c.restore()
     /*----------------------*/
 }
