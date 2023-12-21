@@ -336,7 +336,7 @@ function animate() {
     /*----------------------*/
 }
 registerKeyHandlers();
-animate()
+Launcher.launchGame(60, animate)
 
 
 window.addEventListener('keydown', (event) => {
