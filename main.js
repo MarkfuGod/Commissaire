@@ -302,7 +302,6 @@ function registerKeyHandlers() {
 }
 
 function animate() {
-    window.requestAnimationFrame(animate)
     KeyStatesConsumer.consumes();
     c.fillStyle = 'white'
     c.fillRect(0, 0, canvas.width, canvas.height)
