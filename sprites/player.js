@@ -183,7 +183,7 @@ export default class Player extends Sprite {
 	 * @param {string} key - 精灵的键名
 	 */
 	switchSprite(key) {
-		if (this.image == this.animations[key].image || !this.loaded) {
+		if (this.image === this.animations[key].image || !this.loaded) {
 			return;
 		}
 
@@ -295,17 +295,8 @@ export default class Player extends Sprite {
 		// 	this.camerabox.height )
 
 		//绘制图像
-		c.fillStyle = "rgba(0, 255, 0, 0.2)";
-		c.fillRect(this.position.x, this.position.y, this.width, this.height);
+		this.#drawHelperRectangle();
 
-		c.fillStyle = "rgba(255, 0, 0, 0.2)";
-		c.fillRect(
-			this.hitbox.position.x,
-			this.hitbox.position.y,
-			this.hitbox.width,
-			this.hitbox.height
-		);
-	
 		this.draw();
 
 		this.position.x += this.velocity.x;
@@ -316,6 +307,26 @@ export default class Player extends Sprite {
 		this.checkForVerticalCollisions();
 		this.healthBar.update();
     	this.healthBar.draw(c);
+	}
+
+	#drawHelperRectangle() {
+		this.#drawAttackRange();
+		this.#drawHitboxRange();
+	}
+
+	#drawHitboxRange() {
+		c.fillStyle = "rgba(255, 0, 0, 0.2)";
+		c.fillRect(
+			this.hitbox.position.x,
+			this.hitbox.position.y,
+			this.hitbox.width,
+			this.hitbox.height
+		);
+	}
+
+	#drawAttackRange() {
+		c.fillStyle = "rgba(0, 255, 0, 0.2)";
+		c.fillRect(this.position.x, this.position.y, this.width, this.height);
 	}
 
 	/**
