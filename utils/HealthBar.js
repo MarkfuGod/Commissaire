@@ -5,8 +5,10 @@ export default class HealthBar {
       this.height = 3; // 血条高度
       this.position = { x: 10, y: 10 }; // 血条位置
       console.log(player.classID)
-      if(player.classID != 0)
+      if(player.classID == 1)
         this.dxdy = {dx:28,dy:20}
+      else if(player.classID == 2)
+        this.dxdy = {dx:28,dy:5}
       else
         this.dxdy = {dx:28,dy:10}
     }
