@@ -27,6 +27,8 @@ export default class Enemy extends Sprite {
 	constructor({
 		position,
 		collisionBlocks,
+		classID,
+		HP_limit,
 		imageSrc,
 		frameRate,
 		scale = 0.5,
@@ -39,7 +41,6 @@ export default class Enemy extends Sprite {
 			x: 0,
 			y: 1,
 		};
-		this.classID = 1;
 		this.collisionBlocks = collisionBlocks;
 		this.hitbox = {
 			position: {
@@ -50,6 +51,7 @@ export default class Enemy extends Sprite {
 			height: 10,
 		};
 		this.animations = animations;
+		this.classID = classID;
 		this.healthBar = new HealthBar(this);
 		this.lastDirection = 'left';
 		this.enemyAttackCooldown= 2000;
@@ -72,7 +74,7 @@ export default class Enemy extends Sprite {
 			width: 200,
 			height: 80,
 		};
-		this.HP_limit = 100;
+		this.HP_limit = HP_limit;
 		this.HP = this.HP_limit;
 		this.preHP = this.HP;
 		this.damage = 0.2;
