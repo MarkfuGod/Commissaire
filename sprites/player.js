@@ -1,5 +1,6 @@
 import Sprite from "./sprite.js";
 import CollisionCalculator from "../utils/CollisionCalculator.js";
+import HealthBar from "../utils/HealthBar.js";
 export default class Player extends Sprite {
 	/**
 	 * 玩家类
@@ -12,7 +13,10 @@ export default class Player extends Sprite {
 	 * @param {int} HP_limit - 玩家的最大生命值
 	 * @param {int} HP - 玩家的生命值
 	 * @param {int} damage - 玩家的攻击力
-
+	 * @param {object} enemyList - 敌人列表
+	 * @param {bool} hasDamage - 玩家是否造成伤害
+	 * @param {bool} isDead -玩家是否死亡
+	 * @param {int}  classID - 类别ID
 	 */
 	constructor({
 		position,
@@ -20,16 +24,19 @@ export default class Player extends Sprite {
 		imageSrc,
 		frameRate,
 		scale = 0.5,
+		isDead = false,
 		animations,
 	}) {
 		super({ imageSrc, frameRate, scale });
+		
 		this.jumpingCount = 0;
 		this.position = position;
 		this.velocity = {
 			x: 0,
 			y: 1,
 		};
-
+		this.classID = 0;
+		this.healthBar = new HealthBar(this);
 		this.collisionBlocks = collisionBlocks;
 		this.hitbox = {
 			position: {
@@ -61,7 +68,9 @@ export default class Player extends Sprite {
 		this.HP_limit = 100;
 		this.HP = this.HP_limit;
 		this.damage = 10;
+		this.hasDamage = false;
 	}
+
 
 	/*玩家属性组方法 */
 	get_HP_limit() {
@@ -82,7 +91,12 @@ export default class Player extends Sprite {
 	set_damage(value) {
 		this.damage = value;
 	}
-
+	get_position() {
+		return this.position;
+	}
+	get_hitbox() {
+		return this.hitbox;
+	}
 	/**
 	 * 尝试跳跃
 	 */
@@ -100,27 +114,55 @@ export default class Player extends Sprite {
 		switch(i)
 		{
 			case 0:
-				this.attack1()
+				this.attack(this.damage*1)
 				break
 			case 1:
-				this.attack2()
+				this.attack(this.damage*2)
 				break
 			case 2:
-				this.attack3()
+				this.attack(this.damage*3)
 				break
 		}
 		
+	}
+	//获取敌人信息
+	getEnemies(enemyList)
+	{
+		this.enemyList = enemyList
+	}
+	//判断敌人是否在攻击范围
+	isEnemyInAttackRange(enemy)
+	{
+		return Math.abs(enemy.position.x-this.position.x) <= 40
+				&& 	Math.abs(enemy.position.y-this.position.y) <=20
+	}
+	attack(damageValue) {
+	//插入攻击1逻辑
+	
+		//对玩家水平朝向的一定距离的实体造成伤害
+		for(let i=0;i<this.enemyList.length;i++)
+		{
 
+			if(this.isEnemyInAttackRange(this.enemyList[i]))
+			{
+				if(this.enemyList[i].HP>0 && !this.hasDamage)
+				{
+					this.hasDamage = true
+					this.enemy = this.enemyList[i]
+					if(this.enemyList[i].HP>damageValue)
+					{
+						this.enemyList[i].HP -= damageValue
+					}
+					else
+						this.enemyList[i].HP = 0
+				}
+				
+			}
+		}
+		this.hasDamage = false
+		
 	}
-	attack1() {
-		//插入攻击1逻辑
-	}
-	attack2() {
-		//插入攻击2逻辑
-	}
-	attack3() {
-		//插入攻击3逻辑
-	}
+	
 	/**
 	 * 跳跃方法
 	 */
@@ -263,6 +305,8 @@ export default class Player extends Sprite {
 		this.applyGravity();
 		this.updateHitbox();
 		this.checkForVerticalCollisions();
+		this.healthBar.update();
+    	this.healthBar.draw(c);
 	}
 
 	#drawHelperRectangle() {
