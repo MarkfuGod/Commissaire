@@ -1,5 +1,6 @@
 import Sprite from "./sprite.js";
 import CollisionCalculator from "../utils/CollisionCalculator.js";
+import HealthBar from "../utils/HealthBar.js";
 export default class Enemy extends Sprite {
 	/**
 	 * 敌人类
@@ -12,6 +13,16 @@ export default class Enemy extends Sprite {
 	 * @param {int} HP_limit - 敌人的最大生命值
 	 * @param {int} HP - 敌人的生命值
 	 * @param {int} damage - 敌人的攻击力
+	 * @param {int} player_position - 玩家所在位置
+	 * @param {boolean} closer - 敌人是否继续向玩家移动
+	 * @param {int}  enemyLastAttackTime - 敌人攻击时刻
+	 * @param {int}  enemyAttackCooldown - 敌人攻击冷却
+	 * @param {int}  attackCount- 敌人攻击次数
+	 * @param {bool} hasDamage - 敌人是否造成伤害
+	 * @param {bool} showDead - 是否播放死亡动画
+	 * @param {int} preHP -前一个状态的HP，用于判断是否受到伤害
+	 * @param {bool} behurt - 是否受到伤害
+	 * @param {int}  classID - 类别ID
 	 */
 	constructor({
 		position,
@@ -28,7 +39,7 @@ export default class Enemy extends Sprite {
 			x: 0,
 			y: 1,
 		};
-
+		this.classID = 1;
 		this.collisionBlocks = collisionBlocks;
 		this.hitbox = {
 			position: {
@@ -38,10 +49,14 @@ export default class Enemy extends Sprite {
 			width: 10,
 			height: 10,
 		};
-
 		this.animations = animations;
+		this.healthBar = new HealthBar(this);
 		this.lastDirection = 'left';
-
+		this.enemyAttackCooldown= 2000;
+		this.enemyLastAttackTime = Date.now();
+		this.attackCount = 0;
+		this.showDead = true;
+		this.behurt = true;
 		for (let key in this.animations) {
 			const image = new Image();
 			image.src = this.animations[key].imageSrc;
@@ -59,11 +74,11 @@ export default class Enemy extends Sprite {
 		};
 		this.HP_limit = 100;
 		this.HP = this.HP_limit;
-		this.damage = 5;
+		this.preHP = this.HP;
+		this.damage = 0.2;
 	}
 
-
-	/*敌人属性组方法 */
+	/*敌人属性组方法*/
 	get_HP_limit() {
 		return this.HP_limit;
 	}
@@ -82,29 +97,78 @@ export default class Enemy extends Sprite {
 	set_damage(value) {
 		this.damage = value;
 	}
+	get_position() {
+		return this.position;
+	}
+	get_hitbox() {
+		return this.hitbox;
+	}
 	/**
 	 * 尝试跳跃
 	 */
 	try2Jump() {
-		if (this.jumpingCount == 2) {
-			return;
-		}
 		this.#jump();
+		
 	}
-
+	canEnemyAttack() {
+		return Date.now() >= this.enemyLastAttackTime + this.enemyAttackCooldown;
+	  }
+	//判断玩家是否在攻击范围内
+	isPlayerInAttackRange(player)
+	{
+		return Math.abs(player.position.x-this.position.x) <= 40
+				&& 	Math.abs(player.position.y-this.position.y) <=20
+	}
 	/**
 	 * 攻击方法
 	 */
-	
-	attack() {
-		//插入攻击逻辑
+	attack(player) {
+		console.log(this.attackCount)
+		if(this.attackCount%3!=0)
+		{
+			if(this.lastDirection=='right')
+				this.switchSprite('Attack1_right');
+			else 
+				this.switchSprite('Attack1_left');
+		}
+		else
+		{
+			if(this.lastDirection=='right')
+				this.switchSprite('Attack2_right');
+			else 
+				this.switchSprite('Attack2_left');
+		}
+		if(this.isPlayerInAttackRange(player))
+		{
+			if(player.HP>0 && !this.hasDamage)
+			{
+				this.hasDamage = true
+				if(this.damage>player.HP)
+				{
+					player.HP = 0
+				}
+				else
+				{
+					player.HP -= this.damage
+					if(player.lastDirection=='right')
+						player.switchSprite('TakeHit_right')
+					else
+						player.switchSprite('TakeHit_left')
+				}
+			}
+		}
+		this.hasDamage = false
 	}
+		
+
 	
+	
+
 	/**
 	 * 跳跃方法
 	 */
 	#jump() {
-		this.velocity.y = -1.5;
+		this.velocity.y = -2.0;
 		this.jumpingCount++;
 	}
 
@@ -113,6 +177,97 @@ export default class Enemy extends Sprite {
 	 */
 	#jumpResets() {
 		this.jumpingCount = 0;
+	}
+
+	/**
+	 *敌人AI
+	 */
+	enemy_AI(player_position, player) {
+		//锁定玩家位置
+		if (this.position.x <player_position.x) {
+			this.lastDirection = 'right';
+		} else if (this.position.x > player_position.x) {
+			this.lastDirection = 'left';
+		}
+		
+		//玩家在视野范围内，像角色移动
+		if (CollisionCalculator.hasCollision({object1:this.camerabox, object2:player.hitbox})) {
+			this.closer = true
+			//靠经一段距离后，不再向角色移动
+			
+			if((this.position.x-player_position.x)<30&&(this.position.x-player_position.x)>-30)
+			{
+				//console.log(this.position.x-player_position.x)
+				this.velocity.x = 0;
+				switch(this.lastDirection)
+				{
+					case 'right':
+						this.switchSprite('Idle')
+						break;
+					case 'left':
+						this.switchSprite('IdleLeft')
+						break;
+				}
+				this.closer = false
+				if(this.canEnemyAttack())
+				{
+					console.log('attack')
+					setTimeout(() => {
+						this.enemyLastAttackTime = Date.now();
+						this.attackCount++;
+		
+					}, 500); //500单位时间大约播放完一次攻击动画
+					this.attack(player);
+				}
+			}
+
+			if(this.closer)
+			{
+				//向玩家移动
+				switch (this.lastDirection) {
+				case 'right':
+					this.switchSprite('Run')
+					this.velocity.x = 0.8
+					this.lastDirection = 'right'
+					
+					break;
+				case 'left':
+					this.switchSprite('RunLeft')
+					this.velocity.x = -0.8
+					this.lastDirection = 'left'
+					
+					break;
+				}
+			}
+			//控制跳跃(动画)
+			if (this.velocity.y < 0) {
+			
+				if (this.lastDirection == 'right') this.switchSprite('Jump')
+				else this.switchSprite('JumpLeft')
+			
+			}
+			else if (this.velocity.y > 0) {
+
+				if (this.lastDirection == 'right') this.switchSprite('Fall')
+				else this.switchSprite('FallLeft')
+			}
+					
+		
+		}
+		else
+		{
+			this.velocity.x = 0;
+			switch(this.lastDirection)
+			{
+				case 'right':
+					this.switchSprite('Idle')
+					break;
+				case 'left':
+					this.switchSprite('IdleLeft')
+					break;
+			}
+			
+		}
 	}
 
 	/**
@@ -153,9 +308,11 @@ export default class Enemy extends Sprite {
 			this.hitbox.position.x + this.velocity.x <= 0
 		) {
 			this.velocity.x = 0; // 不能通过边缘
+			return true;
 		}
+		else return false;
 	}
-
+	
 	/**
 	 * 是否需要向左平移相机
 	 * @param {object} canvas - 画布对象
@@ -251,6 +408,8 @@ export default class Enemy extends Sprite {
 		this.applyGravity();
 		this.updateHitbox();
 		this.checkForVerticalCollisions();
+		this.healthBar.update();
+    	this.healthBar.draw(c);
 	}
 
 	/**
@@ -285,6 +444,7 @@ export default class Enemy extends Sprite {
 					const offset =
 						this.hitbox.position.x - this.position.x + this.hitbox.width;
 					this.position.x = collisionBlock.position.x - offset - 0.01; // 减去最后一个
+					this.try2Jump();
 				}
 
 				if (this.velocity.x < 0) {
@@ -293,6 +453,7 @@ export default class Enemy extends Sprite {
 					const offset = this.hitbox.position.x - this.position.x;
 					this.position.x =
 						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // 加上最后一个
+					this.try2Jump();
 				}
 			}
 		}
