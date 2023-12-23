@@ -49,7 +49,11 @@ export default class Sprite {
 		this.draw();
 		this.updateFrames();
 	}
-
+	/**
+	 * @variation elapsedFrame - the global timestamp for player
+	 * @variation frameBuffer - the delay time between player frame
+	 * @variation currentFrame - the current timestamp in player frame circle
+	 */
 	updateFrames() {
 		this.elapsedFrame++;
 
