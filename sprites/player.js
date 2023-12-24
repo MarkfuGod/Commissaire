@@ -108,6 +108,10 @@ export default class Player extends Sprite {
 		}
 		this.#jump();
 	}
+	
+	tryDash() {
+		
+	}
 
 	/**
 	 * 攻击方法
