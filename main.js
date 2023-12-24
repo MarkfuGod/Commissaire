@@ -265,8 +265,8 @@ const Evil_Wizard = new Enemy({
 })
 const Wizard = new Enemy({
     position: {
-        x: 500,
-        y: 300,
+        x: 340,
+        y: 210,
     },
     collisionBlocks,
     platformCollisionBlocks,

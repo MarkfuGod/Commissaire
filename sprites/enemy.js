@@ -3,30 +3,31 @@ import CollisionCalculator from "../utils/CollisionCalculator.js";
 import HealthBar from "../utils/HealthBar.js";
 export default class Enemy extends Sprite {
 	/**
-	 * µĞÈËÀà
-	 * @param {object} position - µĞÈËµÄÎ»ÖÃ
-	 * @param {array} collisionBlocks - Åö×²¿éÊı×é
-	 * @param {string} imageSrc - µĞÈËÍ¼ÏñµÄÂ·¾¶
-	 * @param {number} frameRate - µĞÈË¶¯»­µÄÖ¡ÂÊ
-	 * @param {number} scale - µĞÈËµÄËõ·Å±ÈÀı
-	 * @param {object} animations - µĞÈË¶¯»­¶ÔÏó
-	 * @param {int} HP_limit - µĞÈËµÄ×î´óÉúÃüÖµ
-	 * @param {int} HP - µĞÈËµÄÉúÃüÖµ
-	 * @param {int} damage - µĞÈËµÄ¹¥»÷Á¦
-	 * @param {int} player_position - Íæ¼ÒËùÔÚÎ»ÖÃ
-	 * @param {boolean} closer - µĞÈËÊÇ·ñ¼ÌĞøÏòÍæ¼ÒÒÆ¶¯
-	 * @param {int}  enemyLastAttackTime - µĞÈË¹¥»÷Ê±¿Ì
-	 * @param {int}  enemyAttackCooldown - µĞÈË¹¥»÷ÀäÈ´
-	 * @param {int}  attackCount- µĞÈË¹¥»÷´ÎÊı
-	 * @param {bool} hasDamage - µĞÈËÊÇ·ñÔì³ÉÉËº¦
-	 * @param {bool} showDead - ÊÇ·ñ²¥·ÅËÀÍö¶¯»­
-	 * @param {int} preHP -Ç°Ò»¸ö×´Ì¬µÄHP£¬ÓÃÓÚÅĞ¶ÏÊÇ·ñÊÜµ½ÉËº¦
-	 * @param {bool} behurt - ÊÇ·ñÊÜµ½ÉËº¦
-	 * @param {int}  classID - Àà±ğID
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param {object} position - ï¿½ï¿½ï¿½Ëµï¿½Î»ï¿½ï¿½
+	 * @param {array} collisionBlocks - ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param {string} imageSrc - ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½Â·ï¿½ï¿½
+	 * @param {number} frameRate - ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½Ö¡ï¿½ï¿½
+	 * @param {number} scale - ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½
+	 * @param {object} animations - ï¿½ï¿½ï¿½Ë¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param {int} HP_limit - ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	 * @param {int} HP - ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+	 * @param {int} damage - ï¿½ï¿½ï¿½ËµÄ¹ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param {int} player_position - ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+	 * @param {boolean} closer - ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
+	 * @param {int}  enemyLastAttackTime - ï¿½ï¿½ï¿½Ë¹ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+	 * @param {int}  enemyAttackCooldown - ï¿½ï¿½ï¿½Ë¹ï¿½ï¿½ï¿½ï¿½ï¿½È´
+	 * @param {int}  attackCount- ï¿½ï¿½ï¿½Ë¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param {bool} hasDamage - ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½
+	 * @param {bool} showDead - ï¿½Ç·ñ²¥·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	 * @param {int} preHP -Ç°Ò»ï¿½ï¿½×´Ì¬ï¿½ï¿½HPï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½ï¿½Ç·ï¿½ï¿½Üµï¿½ï¿½Ëºï¿½
+	 * @param {bool} behurt - ï¿½Ç·ï¿½ï¿½Üµï¿½ï¿½Ëºï¿½
+	 * @param {int}  classID - ï¿½ï¿½ï¿½ID
 	 */
 	constructor({
 		position,
 		collisionBlocks,
+		platformCollisionBlocks,
 		classID,
 		HP_limit,
 		imageSrc,
@@ -42,6 +43,7 @@ export default class Enemy extends Sprite {
 			y: 1,
 		};
 		this.collisionBlocks = collisionBlocks;
+		this.platformCollisionBlocks = platformCollisionBlocks;
 		this.hitbox = {
 			position: {
 				x: this.position.x,
@@ -80,7 +82,7 @@ export default class Enemy extends Sprite {
 		this.damage = 0.2;
 	}
 
-	/*µĞÈËÊôĞÔ×é·½·¨*/
+	/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½é·½ï¿½ï¿½*/
 	get_HP_limit() {
 		return this.HP_limit;
 	}
@@ -106,23 +108,25 @@ export default class Enemy extends Sprite {
 		return this.hitbox;
 	}
 	/**
-	 * ³¢ÊÔÌøÔ¾
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾
 	 */
 	try2Jump() {
+		if (this.jumpingCount == 2) {
+			return;
+		}
 		this.#jump();
-		
 	}
 	canEnemyAttack() {
 		return Date.now() >= this.enemyLastAttackTime + this.enemyAttackCooldown;
 	  }
-	//ÅĞ¶ÏÍæ¼ÒÊÇ·ñÔÚ¹¥»÷·¶Î§ÄÚ
+	//ï¿½Ğ¶ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ú¹ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½
 	isPlayerInAttackRange(player)
 	{
 		return Math.abs(player.position.x-this.position.x) <= 40
 				&& 	Math.abs(player.position.y-this.position.y) <=20
 	}
 	/**
-	 * ¹¥»÷·½·¨
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	attack(player) {
 		console.log(this.attackCount)
@@ -167,35 +171,35 @@ export default class Enemy extends Sprite {
 	
 
 	/**
-	 * ÌøÔ¾·½·¨
+	 * ï¿½ï¿½Ô¾ï¿½ï¿½ï¿½ï¿½
 	 */
 	#jump() {
-		this.velocity.y = -2.0;
+		this.velocity.y = -3.0;
 		this.jumpingCount++;
 	}
 
 	/**
-	 * ÌøÔ¾ÖØÖÃ·½·¨
+	 * ï¿½ï¿½Ô¾ï¿½ï¿½ï¿½Ã·ï¿½ï¿½ï¿½
 	 */
 	#jumpResets() {
 		this.jumpingCount = 0;
 	}
 
 	/**
-	 *µĞÈËAI
+	 *ï¿½ï¿½ï¿½ï¿½AI
 	 */
 	enemy_AI(player_position, player) {
-		//Ëø¶¨Íæ¼ÒÎ»ÖÃ
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 		if (this.position.x <player_position.x) {
 			this.lastDirection = 'right';
 		} else if (this.position.x > player_position.x) {
 			this.lastDirection = 'left';
 		}
 		
-		//Íæ¼ÒÔÚÊÓÒ°·¶Î§ÄÚ£¬Ïñ½ÇÉ«ÒÆ¶¯
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò°ï¿½ï¿½Î§ï¿½Ú£ï¿½ï¿½ï¿½ï¿½É«ï¿½Æ¶ï¿½
 		if (CollisionCalculator.hasCollision({object1:this.camerabox, object2:player.hitbox})) {
 			this.closer = true
-			//¿¿¾­Ò»¶Î¾àÀëºó£¬²»ÔÙÏò½ÇÉ«ÒÆ¶¯
+			//ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î¾ï¿½ï¿½ï¿½ó£¬²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É«ï¿½Æ¶ï¿½
 			
 			if((this.position.x-player_position.x)<30&&(this.position.x-player_position.x)>-30)
 			{
@@ -210,22 +214,28 @@ export default class Enemy extends Sprite {
 						this.switchSprite('IdleLeft')
 						break;
 				}
-				this.closer = false
-				if(this.canEnemyAttack())
+				if((this.position.y-player_position.y) < 15 && (this.position.y-player_position.y) > -15) {
+					// ç”¨ Math.abs()æ›´ç®€æ´ 
+					this.closer = false
+					if(this.canEnemyAttack())
 				{
 					console.log('attack')
 					setTimeout(() => {
 						this.enemyLastAttackTime = Date.now();
 						this.attackCount++;
 		
-					}, 500); //500µ¥Î»Ê±¼ä´óÔ¼²¥·ÅÍêÒ»´Î¹¥»÷¶¯»­
+					}, 500); //500ï¿½ï¿½Î»Ê±ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Î¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 					this.attack(player);
 				}
+
+				}
+				else this.try2Jump()
+				
 			}
 
 			if(this.closer)
 			{
-				//ÏòÍæ¼ÒÒÆ¶¯
+				//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 				switch (this.lastDirection) {
 				case 'right':
 					this.switchSprite('Run')
@@ -241,7 +251,8 @@ export default class Enemy extends Sprite {
 					break;
 				}
 			}
-			//¿ØÖÆÌøÔ¾(¶¯»­)
+
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¾(ï¿½ï¿½ï¿½ï¿½)
 			if (this.velocity.y < 0) {
 			
 				if (this.lastDirection == 'right') this.switchSprite('Jump')
@@ -273,8 +284,8 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 * ÇĞ»»¾«Áé·½·¨
-	 * @param {string} key - ¾«ÁéµÄ¼üÃû
+	 * ï¿½Ğ»ï¿½ï¿½ï¿½ï¿½é·½ï¿½ï¿½
+	 * @param {string} key - ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½
 	 */
 	switchSprite(key) {
 		if (this.image == this.animations[key].image || !this.loaded) {
@@ -288,7 +299,7 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 * ¸üĞÂcamerabox
+	 * ï¿½ï¿½ï¿½ï¿½camerabox
 	 */
 	updateCamerabox() {
 		this.camerabox = {
@@ -302,81 +313,21 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 * ¼ì²éË®Æ½·½ÏòÉÏµÄÅö×²
+	 * ï¿½ï¿½ï¿½Ë®Æ½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½×²
 	 */
 	checkforHorizontalCanvasCollision() {
 		if (
 			this.hitbox.position.x + this.hitbox.width + this.velocity.x >= 576 ||
 			this.hitbox.position.x + this.velocity.x <= 0
 		) {
-			this.velocity.x = 0; // ²»ÄÜÍ¨¹ı±ßÔµ
+			this.velocity.x = 0; // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½Ôµ
 			return true;
 		}
 		else return false;
 	}
 	
 	/**
-	 * ÊÇ·ñĞèÒªÏò×óÆ½ÒÆÏà»ú
-	 * @param {object} canvas - »­²¼¶ÔÏó
-	 * @param {object} camera - Ïà»ú¶ÔÏó
-	 */
-	shouldPanCameraToLeft({ canvas, camera }) {
-		const cameraboxRightSide = this.camerabox.position.x + this.camerabox.width;
-
-		if (cameraboxRightSide >= 576) return;
-
-		if (cameraboxRightSide >= canvas.width / 4 + Math.abs(camera.position.x)) {
-			camera.position.x -= this.velocity.x;
-		}
-	}
-
-	/**
-	 * ÊÇ·ñĞèÒªÏòÓÒÆ½ÒÆÏà»ú
-	 * @param {object} canvas - »­²¼¶ÔÏó
-	 * @param {object} camera - Ïà»ú¶ÔÏó
-	 */
-	shouldPanCameraToRight({ canvas, camera }) {
-		if (this.camerabox.position.x <= 0) return;
-		if (this.camerabox.position.x <= Math.abs(camera.position.x)) {
-			camera.position.x -= this.velocity.x;
-		}
-	}
-
-	/**
-	 * ÊÇ·ñĞèÒªÏòÏÂÆ½ÒÆÏà»ú
-	 * @param {object} canvas - »­²¼¶ÔÏó
-	 * @param {object} camera - Ïà»ú¶ÔÏó
-	 */
-	shouldPanCameraDown({ canvas, camera }) {
-		if (this.camerabox.position.y + this.velocity.y <= 0) return;
-
-		if (this.camerabox.position.y <= Math.abs(camera.position.y) + canvas.height / 4) {
-			camera.position.y -= this.velocity.y;
-		}
-	}
-
-	/**
-	 * ÊÇ·ñĞèÒªÏòÉÏÆ½ÒÆÏà»ú
-	 * @param {object} canvas - »­²¼¶ÔÏó
-	 * @param {object} camera - Ïà»ú¶ÔÏó
-	 */
-	shouldPanCameraUp({ canvas, camera }) {
-		if (
-			this.camerabox.position.y + this.camerabox.height + this.velocity.y >=
-			432
-		)
-			return;
-
-		if (
-			this.camerabox.position.y + this.camerabox.height >=
-			Math.abs(camera.position.y) + canvas.height / 4
-		) {
-			camera.position.y -= this.velocity.y;
-		}
-	}
-
-	/**
-	 * ¸üĞÂ·½·¨
+	 * ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½
 	 */
 	update() {
 		this.updateFrames();
@@ -390,7 +341,8 @@ export default class Enemy extends Sprite {
 		// 	this.camerabox.width,
 		// 	this.camerabox.height )
 
-		//»æÖÆÍ¼Ïñ
+		//ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+		/*
 		c.fillStyle = "rgba(0, 255, 0, 0.2)";
 		c.fillRect(this.position.x, this.position.y, this.width, this.height);
 
@@ -401,21 +353,22 @@ export default class Enemy extends Sprite {
 			this.hitbox.width,
 			this.hitbox.height
 		);
-	
+	*/
 		this.draw();
 
 		this.position.x += this.velocity.x;
 		this.updateHitbox();
-		this.checkForHorizontalCollisions(); //×¢ÒâĞòÁĞ
+		this.checkForHorizontalCollisions(); //×¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		this.applyGravity();
 		this.updateHitbox();
 		this.checkForVerticalCollisions();
+		this.check();
 		this.healthBar.update();
     	this.healthBar.draw(c);
 	}
 
 	/**
-	 * ¸üĞÂhitbox
+	 * ï¿½ï¿½ï¿½ï¿½hitbox
 	 */
 	updateHitbox() {
 		this.hitbox = {
@@ -429,7 +382,7 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 * ¼ì²éË®Æ½Åö×²
+	 * ï¿½ï¿½ï¿½Ë®Æ½ï¿½ï¿½×²
 	 */
 	checkForHorizontalCollisions() {
 		for (let i = 0; i < this.collisionBlocks.length; i++) {
@@ -445,7 +398,7 @@ export default class Enemy extends Sprite {
 					this.velocity.x = 0;
 					const offset =
 						this.hitbox.position.x - this.position.x + this.hitbox.width;
-					this.position.x = collisionBlock.position.x - offset - 0.01; // ¼õÈ¥×îºóÒ»¸ö
+					this.position.x = collisionBlock.position.x - offset - 0.01; // ï¿½ï¿½È¥ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
 					this.try2Jump();
 				}
 
@@ -454,7 +407,7 @@ export default class Enemy extends Sprite {
 
 					const offset = this.hitbox.position.x - this.position.x;
 					this.position.x =
-						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // ¼ÓÉÏ×îºóÒ»¸ö
+						collisionBlock.position.x + collisionBlock.width - offset + 0.01; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
 					this.try2Jump();
 				}
 			}
@@ -462,7 +415,7 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 * Ó¦ÓÃÖØÁ¦
+	 * Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	applyGravity() {
 		this.velocity.y += gravity;
@@ -470,7 +423,7 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 * ¼ì²é´¹Ö±Åö×²
+	 * ï¿½ï¿½é´¹Ö±ï¿½ï¿½×²
 	 */
 	checkForVerticalCollisions() {
 		for (let i = 0; i < this.collisionBlocks.length; i++) {
@@ -488,7 +441,7 @@ export default class Enemy extends Sprite {
 					const offset =
 						this.hitbox.position.y - this.position.y + this.hitbox.height;
 
-					this.position.y = collisionBlock.position.y - offset - 0.01; // ¼õÈ¥×îºóÒ»¸ö
+					this.position.y = collisionBlock.position.y - offset - 0.01; // ï¿½ï¿½È¥ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
 					break;
 				}
 
@@ -497,7 +450,29 @@ export default class Enemy extends Sprite {
 
 					const offset = this.hitbox.position.y - this.position.y;
 					this.position.y =
-						collisionBlock.position.y + collisionBlock.height - offset + 0.01; // ¼ÓÉÏ×îºóÒ»¸ö
+						collisionBlock.position.y + collisionBlock.height - offset + 0.01; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
+					break;
+				}
+			}
+		}
+	}
+	check() {
+		for (let i = 0; i < this.platformCollisionBlocks.length; i++) {
+			const platformCollisionBlock = this.platformCollisionBlocks[i];
+
+			if (
+				CollisionCalculator.hasPlatformCollision({
+					object1: this.hitbox,
+					object2: platformCollisionBlock,
+				})
+			) {
+				if (this.velocity.y >= 0) {
+					this.velocity.y = 0;
+					this.#jumpResets();
+					const offset =
+						this.hitbox.position.y - this.position.y + this.hitbox.height;
+
+					this.position.y = platformCollisionBlock.position.y - offset - 0.01; // å‡å»æœ€åä¸€ä¸ª
 					break;
 				}
 			}
