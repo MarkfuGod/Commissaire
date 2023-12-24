@@ -1,4 +1,7 @@
 export default class Sprite {
+
+	static id = 0;
+
 	constructor({
 		position,
 		imageSrc,
@@ -20,6 +23,8 @@ export default class Sprite {
 		this.currentFrame = 0;
 		this.frameBuffer = frameBuffer;
 		this.elapsedFrame = 0;
+		this.id = Sprite.id;
+		Sprite.id += 1;
 	}
 	draw() {
 		if (!this.image) return;
@@ -62,4 +67,33 @@ export default class Sprite {
 			else this.currentFrame = 0;
 		}
 	}
+
+	saveData() {
+		let storage = window.localStorage;
+		this.setStorage(this.id + "position", this.position)
+	}
+
+	loadData() {
+		let storage = window.localStorage;
+		this.position = this.getStorage(this.id + "position")
+	}
+
+	toJson(object) {
+		return JSON.stringify(object);
+	}
+
+	toObject(json) {
+		return JSON.parse(json);
+	}
+
+	setStorage(key, object) {
+		let storage = window.localStorage;
+		storage.setItem(key, this.toJson(object))
+	}
+
+	getStorage(key) {
+		let storage = window.localStorage;
+		return this.toObject(storage.getItem(key))
+	}
+
 }

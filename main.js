@@ -4,6 +4,7 @@ import Enemy from "./sprites/enemy.js"
 import Sprite from "./sprites/sprite.js"
 import KeyStatesConsumer from "./utils/KeyStatesConsumer.js"
 import Launcher from "./utils/Launcher.js";
+import SaveHandler from "./utils/SaveHandler.js";
 
 canvas.width = 1072
 canvas.height = 872
@@ -382,6 +383,12 @@ const keys = {
     i: {
         pressed: false
     },
+    p: {
+        pressed: false
+    },
+    l: {
+        pressed: false
+    },
 }
 
 const background = new Sprite({
@@ -459,6 +466,12 @@ function registerKeyHandlers() {
         }, true)
 }
 
+enemyList.push(Evil_Wizard)
+enemyList.push(Wizard)
+player.getEnemies(enemyList)
+
+const saveHandler = new SaveHandler(player, enemyList, camera)
+
 function animate() {
     KeyStatesConsumer.consumes();
     c.fillStyle = 'white'
@@ -506,9 +519,7 @@ function animate() {
         camera.position = {x:0,y:0}
         background.update()
     }
-    enemyList.push(Evil_Wizard)
-    enemyList.push(Wizard)
-    player.getEnemies(enemyList)
+
     
    
     if(Evil_Wizard.HP > 0)
@@ -643,6 +654,18 @@ window.addEventListener('keydown', (event) => {
                 console.log('attack3!')
             }
             break
+        case 'p':
+            if (!keys.p.pressed) {
+                keys.p.pressed = true
+                saveHandler.save()
+            }
+            break
+        case 'l':
+            if (!keys.l.pressed) {
+                keys.l.pressed = true
+                saveHandler.load()
+            }
+            break
 
     }
 })
@@ -657,6 +680,12 @@ window.addEventListener('keyup', (event) => {
             break
         case 'w':
             keys.w.pressed = false
+            break
+        case 'p':
+            keys.p.pressed = false
+            break
+        case 'l':
+            keys.l.pressed = false
             break
     }
 })

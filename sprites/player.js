@@ -443,5 +443,18 @@ export default class Player extends Sprite {
 		}
 	}
 
+	saveData() {
+		super.saveData()
+		this.setStorageWithId("hitbox", this.hitbox)
+		this.setStorageWithId("HP", this.HP)
+		this.setStorageWithId("camerabox", this.camerabox)
+	}
+
+	loadData() {
+		super.loadData()
+		this.hitbox = this.getStorage(this.id + "hitbox")
+		this.HP = this.getStorage(this.id + "HP")
+	}
+
 
 }
