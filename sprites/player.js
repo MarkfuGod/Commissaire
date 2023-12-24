@@ -21,6 +21,7 @@ export default class Player extends Sprite {
 	constructor({
 		position,
 		collisionBlocks,
+		platformCollisionBlocks,
 		imageSrc,
 		frameRate,
 		scale = 0.5,
@@ -38,6 +39,7 @@ export default class Player extends Sprite {
 		this.classID = 0;
 		this.healthBar = new HealthBar(this);
 		this.collisionBlocks = collisionBlocks;
+		this.platformCollisionBlocks = platformCollisionBlocks;
 		this.hitbox = {
 			position: {
 				x: this.position.x,
@@ -254,7 +256,7 @@ export default class Player extends Sprite {
 	shouldPanCameraDown({ canvas, camera }) {
 		if (this.camerabox.position.y + this.velocity.y <= 0) return;
 
-		if (this.camerabox.position.y <= Math.abs(camera.position.y) + canvas.height / 4) {
+		if (this.camerabox.position.y <= Math.abs(camera.position.y)) {
 			camera.position.y -= this.velocity.y;
 		}
 	}
@@ -295,7 +297,7 @@ export default class Player extends Sprite {
 		// 	this.camerabox.height )
 
 		//绘制图像
-		this.#drawHelperRectangle();
+		//this.#drawHelperRectangle();
 
 		this.draw();
 
@@ -305,6 +307,7 @@ export default class Player extends Sprite {
 		this.applyGravity();
 		this.updateHitbox();
 		this.checkForVerticalCollisions();
+		this.check();
 		this.healthBar.update();
     	this.healthBar.draw(c);
 	}
@@ -416,4 +419,29 @@ export default class Player extends Sprite {
 			}
 		}
 	}
+	// platform Collisions
+	check() {
+		for (let i = 0; i < this.platformCollisionBlocks.length; i++) {
+			const platformCollisionBlock = this.platformCollisionBlocks[i];
+
+			if (
+				CollisionCalculator.hasPlatformCollision({
+					object1: this.hitbox,
+					object2: platformCollisionBlock,
+				})
+			) {
+				if (this.velocity.y >= 0) {
+					this.velocity.y = 0;
+					this.#jumpResets();
+					const offset =
+						this.hitbox.position.y - this.position.y + this.hitbox.height;
+
+					this.position.y = platformCollisionBlock.position.y - offset - 0.01; // 减去最后一个
+					break;
+				}
+			}
+		}
+	}
+
+
 }

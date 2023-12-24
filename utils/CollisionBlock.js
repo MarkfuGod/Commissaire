@@ -1,8 +1,8 @@
 export default class CollisionBlock{
-	constructor({position, imageSrc}){
+	constructor({position, height = 16}){
 		this.position = position // the actual position
-		this.width = 12
-		this.height = 12
+		this.width = 16
+		this.height = 16
 	}
 
 	draw(){
