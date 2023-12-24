@@ -14,6 +14,29 @@ const scaledCanvas = {
     height: canvas.height / 4,
 }
 
+var swordAttack1 = new Howl({
+    src: ['swordAttack1.mp3'],
+    volume:0.5
+});
+
+var swordAttack2 = new Howl({
+    src: ['swordAttack2.mp3'],
+    volume:0.5
+});
+
+var swordAttack3 = new Howl({
+    src: ['swordAttack3.mp3'],
+    volume:0.5
+});
+
+var Walk = new Howl({
+    src: ['Walk.mp3']
+});
+
+var Jump = new Howl({
+    src: ['Jump.mp3']
+});
+
 const floorCollisions2D = []
 
 for (let i = 0; i < floorCollisions.length; i += 36) {
@@ -170,7 +193,7 @@ const player = new Player({
 //添加敌人测试
 const Evil_Wizard = new Enemy({
     position: {
-        x: 100,
+        x: 250,
         y: 300,
     },
     collisionBlocks,
@@ -388,7 +411,7 @@ const keys = {
     },
     l: {
         pressed: false
-    },
+    }
 }
 
 const background = new Sprite({
@@ -428,6 +451,7 @@ function registerKeyHandlers() {
             if (player.lastDirection === 'right') {
                 player.switchSprite('Attack1_right')
                 player.lastDirection = 'right'
+                console.log("YesA")
             } else {
                 player.switchSprite('Attack1_left')
                 player.lastDirection = 'left'
@@ -604,7 +628,6 @@ function animate() {
 
 registerKeyHandlers();
 Launcher.launchGame(60, animate)
-
 document.addEventListener('DOMContentLoaded', function() {
     var audio = document.getElementById('clockTower');
 
@@ -615,10 +638,46 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+// 定义一个变量来追踪声音是否正在播放
+let isPlaying = false;
+
+// 监听键盘事件
+document.addEventListener('keydown', function(e) {
+  if (e.keyCode === 68 || e.keyCode === 65) { // D键的keyCode是68
+    // 如果声音没有在播放，并且这次按下的D键是连续按下的第一个D键
+    if (!isPlaying && !isRecentPress) {
+      isPlaying = true;
+      Walk.once('end', function() {
+        console.log('Walk finished playing.');
+        isPlaying = false;
+      });
+      Walk.play();
+      // 设置一个计时器，如果在150毫秒内再次按下D键，视为连续按下的D键
+      // 这个时间可以根据实际情况调整
+      isRecentPress = true;
+      setTimeout(() => {
+        isRecentPress = false;
+      }, 150);
+    }
+  }
+});
+
+// 监听键盘抬起事件
+document.addEventListener('keyup', function(e) {
+  if (e.keyCode === 68 || e.keyCode === 65) { // 检查是否是D键
+    Walk.stop()
+    // 如果是D键被抬起，重置变量
+    isPlaying = false;
+  }
+});
+
+// 定义一个变量来追踪最近一次按下的D键
+let isRecentPress = false;
 window.addEventListener('keydown', (event) => {
     switch (event.key) {
         case 'd':
             keys.d.pressed = true
+            //Walk.play()
             break
         case 'a':
             keys.a.pressed = true
@@ -627,6 +686,7 @@ window.addEventListener('keydown', (event) => {
             if (!keys.w.pressed) {
                 keys.w.pressed = true
                 player.try2Jump()
+                Jump.play()
                 console.log('what the fuck')
             }
             break
@@ -635,6 +695,7 @@ window.addEventListener('keydown', (event) => {
             if (!keys.j.pressed) {
                 keys.j.pressed = true
                 player.try2Attack(0)
+                swordAttack1.play();
                 console.log('attack1!')
             }
             break
@@ -642,6 +703,7 @@ window.addEventListener('keydown', (event) => {
             if (!keys.k.pressed) {
                 keys.k.pressed = true
                 player.try2Attack(1)
+                swordAttack2.play();
                 console.log('attack2!')
 
                 console.log(player.currentAnimationName)
@@ -651,6 +713,7 @@ window.addEventListener('keydown', (event) => {
             if (!keys.i.pressed) {
                 keys.i.pressed = true
                 player.try2Attack(2)
+                swordAttack3.play();
                 console.log('attack3!')
             }
             break
@@ -674,6 +737,7 @@ window.addEventListener('keyup', (event) => {
     switch (event.key) {
         case 'd':
             keys.d.pressed = false
+            //Walk.stop()
             break
         case 'a':
             keys.a.pressed = false
@@ -684,6 +748,7 @@ window.addEventListener('keyup', (event) => {
         case 'p':
             keys.p.pressed = false
             break
+
         case 'l':
             keys.l.pressed = false
             break
