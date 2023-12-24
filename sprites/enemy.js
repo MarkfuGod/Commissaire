@@ -478,4 +478,21 @@ export default class Enemy extends Sprite {
 			}
 		}
 	}
+
+	saveData() {
+		super.saveData()
+		this.setStorage( this.id + "hitbox", this.hitbox)
+		this.setStorage(this.id + "HP", this.HP)
+		this.setStorage(this.id + "camerabox", this.camerabox)
+		this.setStorage(this.id + "showDead", this.showDead)
+	}
+
+	loadData() {
+		super.loadData()
+		this.hitbox = this.getStorage(this.id + "hitbox")
+		this.HP = this.getStorage(this.id + "HP")
+		this.camerabox = this.getStorage(this.id + "camerabox")
+		this.showDead = this.getStorage(this.id + "showDead")
+	}
+
 }
