@@ -454,6 +454,7 @@ export default class Player extends Sprite {
 		super.loadData()
 		this.hitbox = this.getStorage(this.id + "hitbox")
 		this.HP = this.getStorage(this.id + "HP")
+		this.camerabox = this.getStorage("camerabox")
 	}
 
 
