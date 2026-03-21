@@ -79,7 +79,9 @@ export default class Enemy extends Sprite {
 		this.HP_limit = HP_limit;
 		this.HP = this.HP_limit;
 		this.preHP = this.HP;
-		this.damage = 0.2;
+		this.damage = 10;
+		this.closer = false;
+		this.hasDamage = false;
 	}
 
 	/*���������鷽��*/
@@ -126,44 +128,23 @@ export default class Enemy extends Sprite {
 				&& 	Math.abs(player.position.y-this.position.y) <=20
 	}
 	/**
-	 * ��������
+	 * Attack the player once per cooldown trigger.
+	 * Damage is applied a single time; the caller (enemy_AI) is responsible
+	 * for enforcing the cooldown so this method is not called every frame.
 	 */
 	attack(player) {
-		console.log(this.attackCount)
-		if(this.attackCount%3!=0)
-		{
-			if(this.lastDirection=='right')
-				this.switchSprite('Attack1_right');
-			else 
-				this.switchSprite('Attack1_left');
+		if (this.attackCount % 3 !== 0) {
+			this.switchSprite(this.lastDirection === 'right' ? 'Attack1_right' : 'Attack1_left');
+		} else {
+			this.switchSprite(this.lastDirection === 'right' ? 'Attack2_right' : 'Attack2_left');
 		}
-		else
-		{
-			if(this.lastDirection=='right')
-				this.switchSprite('Attack2_right');
-			else 
-				this.switchSprite('Attack2_left');
-		}
-		if(this.isPlayerInAttackRange(player))
-		{
-			if(player.HP>0 && !this.hasDamage)
-			{
-				this.hasDamage = true
-				if(this.damage>player.HP)
-				{
-					player.HP = 0
-				}
-				else
-				{
-					player.HP -= this.damage
-					if(player.lastDirection=='right')
-						player.switchSprite('TakeHit_right')
-					else
-						player.switchSprite('TakeHit_left')
-				}
+
+		if (this.isPlayerInAttackRange(player) && player.HP > 0) {
+			player.HP = Math.max(0, player.HP - this.damage);
+			if (player.HP > 0) {
+				player.switchSprite(player.lastDirection === 'right' ? 'TakeHit_right' : 'TakeHit_left');
 			}
 		}
-		this.hasDamage = false
 	}
 		
 
@@ -186,100 +167,64 @@ export default class Enemy extends Sprite {
 	}
 
 	/**
-	 *����AI
+	 * Enemy AI — called every frame.
+	 *
+	 * States:
+	 *  - Out of detection range  → Idle
+	 *  - In detection range, attack range not yet reached → Chase (+ jump when player is above)
+	 *  - In attack range → Stop and attack on cooldown
+	 *
+	 * Jumping/falling animations always take priority over the state animations.
 	 */
 	enemy_AI(player_position, player) {
-		//�������λ��
-		if (this.position.x <player_position.x) {
-			this.lastDirection = 'right';
-		} else if (this.position.x > player_position.x) {
-			this.lastDirection = 'left';
-		}
-		
-		//�������Ұ��Χ�ڣ����ɫ�ƶ�
-		if (CollisionCalculator.hasCollision({object1:this.camerabox, object2:player.hitbox})) {
-			this.closer = true
-			//����һ�ξ���󣬲������ɫ�ƶ�
-			
-			if((this.position.x-player_position.x)<30&&(this.position.x-player_position.x)>-30)
-			{
-				//console.log(this.position.x-player_position.x)
-				this.velocity.x = 0;
-				switch(this.lastDirection)
-				{
-					case 'right':
-						this.switchSprite('Idle')
-						break;
-					case 'left':
-						this.switchSprite('IdleLeft')
-						break;
-				}
-				if((this.position.y-player_position.y) < 15 && (this.position.y-player_position.y) > -15) {
-					// 用 Math.abs()更简洁 
-					this.closer = false
-					if(this.canEnemyAttack())
-				{
-					console.log('attack')
-					setTimeout(() => {
-						this.enemyLastAttackTime = Date.now();
-						this.attackCount++;
-		
-					}, 500); //500��λʱ���Լ������һ�ι�������
-					this.attack(player);
-				}
+		const dx = player_position.x - this.position.x;
+		const dy = player_position.y - this.position.y; // positive = player is below enemy
 
-				}
-				else this.try2Jump()
-				
-			}
+		// Keep facing direction up to date
+		if (dx > 0) this.lastDirection = 'right';
+		else if (dx < 0) this.lastDirection = 'left';
 
-			if(this.closer)
-			{
-				//������ƶ�
-				switch (this.lastDirection) {
-				case 'right':
-					this.switchSprite('Run')
-					this.velocity.x = 0.8
-					this.lastDirection = 'right'
-					
-					break;
-				case 'left':
-					this.switchSprite('RunLeft')
-					this.velocity.x = -0.8
-					this.lastDirection = 'left'
-					
-					break;
-				}
-			}
+		const inDetectionRange = CollisionCalculator.hasCollision({
+			object1: this.camerabox,
+			object2: player.hitbox,
+		});
 
-			//������Ծ(����)
-			if (this.velocity.y < 0) {
-			
-				if (this.lastDirection == 'right') this.switchSprite('Jump')
-				else this.switchSprite('JumpLeft')
-			
-			}
-			else if (this.velocity.y > 0) {
-
-				if (this.lastDirection == 'right') this.switchSprite('Fall')
-				else this.switchSprite('FallLeft')
-			}
-					
-		
-		}
-		else
-		{
+		if (!inDetectionRange) {
+			// Player is too far away — stand idle
 			this.velocity.x = 0;
-			switch(this.lastDirection)
-			{
-				case 'right':
-					this.switchSprite('Idle')
-					break;
-				case 'left':
-					this.switchSprite('IdleLeft')
-					break;
+			this.switchSprite(this.lastDirection === 'right' ? 'Idle' : 'IdleLeft');
+			return;
+		}
+
+		const inAttackRange = Math.abs(dx) <= 35 && Math.abs(dy) <= 25;
+
+		if (inAttackRange) {
+			// Close enough to hit — stop moving and attack
+			this.velocity.x = 0;
+			this.switchSprite(this.lastDirection === 'right' ? 'Idle' : 'IdleLeft');
+
+			if (this.canEnemyAttack()) {
+				this.enemyLastAttackTime = Date.now();
+				this.attackCount++;
+				this.attack(player);
 			}
-			
+		} else {
+			// Chase the player
+			const speed = 0.8;
+			this.velocity.x = dx > 0 ? speed : -speed;
+			this.switchSprite(dx > 0 ? 'Run' : 'RunLeft');
+
+			// Jump to reach a player who is noticeably above and enemy is grounded
+			if (dy < -20 && this.velocity.y === 0) {
+				this.try2Jump();
+			}
+		}
+
+		// Jumping / falling animations override the state animations above
+		if (this.velocity.y < -0.1) {
+			this.switchSprite(this.lastDirection === 'right' ? 'Jump' : 'JumpLeft');
+		} else if (this.velocity.y > 0.5) {
+			this.switchSprite(this.lastDirection === 'right' ? 'Fall' : 'FallLeft');
 		}
 	}
 
