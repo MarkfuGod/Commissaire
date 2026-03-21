@@ -1,4 +1,7 @@
 {
+  "name": "commissaire",
+  "version": "1.0.0",
+  "description": "A 2D side-scrolling action game built with vanilla JavaScript and Canvas",
   "dependencies": {
     "connect": "^3.7.0",
     "howler": "^2.2.4",

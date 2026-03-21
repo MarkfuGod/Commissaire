@@ -15,26 +15,26 @@ const scaledCanvas = {
 }
 
 var swordAttack1 = new Howl({
-    src: ['swordAttack1.mp3'],
+    src: ['assets/audio/swordAttack1.mp3'],
     volume:0.5
 });
 
 var swordAttack2 = new Howl({
-    src: ['swordAttack2.mp3'],
+    src: ['assets/audio/swordAttack2.mp3'],
     volume:0.5
 });
 
 var swordAttack3 = new Howl({
-    src: ['swordAttack3.mp3'],
+    src: ['assets/audio/swordAttack3.mp3'],
     volume:0.5
 });
 
 var Walk = new Howl({
-    src: ['Walk.mp3']
+    src: ['assets/audio/Walk.mp3']
 });
 
 var Jump = new Howl({
-    src: ['Jump.mp3']
+    src: ['assets/audio/Jump.mp3']
 });
 
 const floorCollisions2D = []

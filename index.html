@@ -1,10 +1,28 @@
-<style type="text/css">
-	body{
-		background: black;
-	}
-</style>
-<canvas></canvas>
-<audio id="clockTower" src="assets/ClockTower.mp3" loop="loop"></audio>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
-<script src="global.js"></script>
-<script type="module" src="main.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Commissaire</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <canvas></canvas>
+  <audio id="clockTower" src="assets/audio/ClockTower.mp3" loop></audio>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+  <script src="global.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
