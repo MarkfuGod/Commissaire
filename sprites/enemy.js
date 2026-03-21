@@ -56,11 +56,9 @@ export default class Enemy extends Sprite {
 		this.classID = classID;
 		this.healthBar = new HealthBar(this);
 		this.lastDirection = 'left';
-		this.enemyAttackCooldown= 2000;
 		this.enemyLastAttackTime = Date.now();
 		this.attackCount = 0;
 		this.showDead = true;
-		this.behurt = true;
 		for (let key in this.animations) {
 			const image = new Image();
 			image.src = this.animations[key].imageSrc;
@@ -92,17 +90,20 @@ export default class Enemy extends Sprite {
 			this.enemyAttackCooldown = 2000;
 			this.speed = 0.8;
 			this.invincibilityDuration = 350;
+			this.attackAnimationDuration = 700; // ms the attack anim plays before reverting to Idle
 		} else if (this.classID === 2) {
 			// Wizard — boss: hits harder, faster cooldown, shorter stun window
 			this.damage = 18;
 			this.enemyAttackCooldown = 1400;
 			this.speed = 1.1;
 			this.invincibilityDuration = 200;
+			this.attackAnimationDuration = 1000;
 		} else {
 			this.damage = 10;
 			this.enemyAttackCooldown = 2000;
 			this.speed = 0.8;
 			this.invincibilityDuration = 350;
+			this.attackAnimationDuration = 700;
 		}
 	}
 
@@ -247,12 +248,18 @@ export default class Enemy extends Sprite {
 		if (inAttackRange) {
 			// Close enough to hit — stop moving and attack
 			this.velocity.x = 0;
-			this.switchSprite(this.lastDirection === 'right' ? 'Idle' : 'IdleLeft');
 
 			if (this.canEnemyAttack()) {
 				this.enemyLastAttackTime = Date.now();
 				this.attackCount++;
 				this.attack(player);
+			}
+
+			// Revert to Idle only after the attack animation has had time to finish.
+			// Without this guard, Idle would override the attack sprite every frame.
+			if (this.attackCount === 0 ||
+				Date.now() - this.enemyLastAttackTime > this.attackAnimationDuration) {
+				this.switchSprite(this.lastDirection === 'right' ? 'Idle' : 'IdleLeft');
 			}
 		} else {
 			// Chase the player
