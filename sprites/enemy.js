@@ -78,10 +78,32 @@ export default class Enemy extends Sprite {
 		};
 		this.HP_limit = HP_limit;
 		this.HP = this.HP_limit;
-		this.preHP = this.HP;
-		this.damage = 10;
 		this.closer = false;
-		this.hasDamage = false;
+
+		// Combat state
+		this.isInvincible = false;
+		this.lastHitTime = 0;
+		this.deathStarted = false;
+
+		// Per-class stat sheet
+		if (this.classID === 1) {
+			// Evil Wizard — standard enemy
+			this.damage = 10;
+			this.enemyAttackCooldown = 2000;
+			this.speed = 0.8;
+			this.invincibilityDuration = 350;
+		} else if (this.classID === 2) {
+			// Wizard — boss: hits harder, faster cooldown, shorter stun window
+			this.damage = 18;
+			this.enemyAttackCooldown = 1400;
+			this.speed = 1.1;
+			this.invincibilityDuration = 200;
+		} else {
+			this.damage = 10;
+			this.enemyAttackCooldown = 2000;
+			this.speed = 0.8;
+			this.invincibilityDuration = 350;
+		}
 	}
 
 	/*���������鷽��*/
@@ -138,13 +160,34 @@ export default class Enemy extends Sprite {
 		} else {
 			this.switchSprite(this.lastDirection === 'right' ? 'Attack2_right' : 'Attack2_left');
 		}
-
-		if (this.isPlayerInAttackRange(player) && player.HP > 0) {
-			player.HP = Math.max(0, player.HP - this.damage);
-			if (player.HP > 0) {
-				player.switchSprite(player.lastDirection === 'right' ? 'TakeHit_right' : 'TakeHit_left');
-			}
+		if (this.isPlayerInAttackRange(player)) {
+			player.takeDamage(this.damage, this.lastDirection);
 		}
+	}
+
+	/**
+	 * Receive a hit — apply damage once, trigger i-frames, knockback, and TakeHit animation.
+	 * Silently ignored while already invincible or dead.
+	 */
+	takeDamage(amount, attackerDirection) {
+		if (this.isInvincible || this.HP <= 0) return;
+		this.HP = Math.max(0, this.HP - amount);
+		this.isInvincible = true;
+		this.lastHitTime = Date.now();
+		// Knockback
+		this.velocity.x = attackerDirection === 'right' ? 1.5 : -1.5;
+		this.velocity.y = -0.5;
+		this.switchSprite(this.lastDirection === 'right' ? 'TakeHit_right' : 'TakeHit_left');
+	}
+
+	/**
+	 * Trigger the death animation exactly once, then hide the enemy.
+	 */
+	startDeathAnimation() {
+		if (this.deathStarted) return;
+		this.deathStarted = true;
+		this.switchSprite(this.lastDirection === 'right' ? 'Death' : 'DeathMirror');
+		setTimeout(() => { this.showDead = false; }, 680);
 	}
 		
 
@@ -177,6 +220,9 @@ export default class Enemy extends Sprite {
 	 * Jumping/falling animations always take priority over the state animations.
 	 */
 	enemy_AI(player_position, player) {
+		// Stunned after taking a hit — let TakeHit animation play uninterrupted
+		if (this.isInvincible) return;
+
 		const dx = player_position.x - this.position.x;
 		const dy = player_position.y - this.position.y; // positive = player is below enemy
 
@@ -210,8 +256,7 @@ export default class Enemy extends Sprite {
 			}
 		} else {
 			// Chase the player
-			const speed = 0.8;
-			this.velocity.x = dx > 0 ? speed : -speed;
+			this.velocity.x = dx > 0 ? this.speed : -this.speed;
 			this.switchSprite(dx > 0 ? 'Run' : 'RunLeft');
 
 			// Jump to reach a player who is noticeably above and enemy is grounded
@@ -236,7 +281,7 @@ export default class Enemy extends Sprite {
 		if (this.image == this.animations[key].image || !this.loaded) {
 			return;
 		}
-
+		this.currentFrame = 0;
 		this.image = this.animations[key].image;
 		this.frameBuffer = this.animations[key].frameBuffer;
 		this.frameRate = this.animations[key].frameRate;
@@ -275,6 +320,10 @@ export default class Enemy extends Sprite {
 	 * ���·���
 	 */
 	update() {
+		// Tick down invincibility frames
+		if (this.isInvincible && Date.now() - this.lastHitTime > this.invincibilityDuration) {
+			this.isInvincible = false;
+		}
 		this.updateFrames();
 		this.updateHitbox();
 

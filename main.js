@@ -522,20 +522,10 @@ function animate() {
         if (player.lastDirection === 'right') player.switchSprite('Fall')
         else player.switchSprite('FallLeft')
     }
-    if(player.HP == 0)
-    {
-        console.log(player.HP)
-        if(!player.isDead)
-        {
-            if(player.lastDirection == 'right')
-                player.switchSprite('Death')
-            else
-                player.switchSprite('DeathMirror')
-        }
-        setTimeout(() => {
-            player.isDead = true
-        }, 500);
-        
+    if (player.HP <= 0 && !player.deathStarted) {
+        player.deathStarted = true
+        player.switchSprite(player.lastDirection === 'right' ? 'Death' : 'DeathMirror')
+        setTimeout(() => { player.isDead = true }, 500)
     }
     if(player.isDead)
     {
@@ -546,84 +536,24 @@ function animate() {
 
     
    
-    if(Evil_Wizard.HP > 0)
-    {
+    if(Evil_Wizard.HP > 0) {
         Evil_Wizard.checkforHorizontalCanvasCollision()
-        Evil_Wizard.enemy_AI(player.position,player)
-        //检查敌人血量是否发生变化，若减少则播放受击动画
-        if(Evil_Wizard.HP < Evil_Wizard.preHP)
-        {
-            Evil_Wizard.behurt = false
-            Evil_Wizard.preHP = Evil_Wizard.HP
-        }
-        if(!Evil_Wizard.behurt)
-        {
-            if(Evil_Wizard.lastDirection == 'right')
-                Evil_Wizard.switchSprite('TakeHit_right')
-            else
-                Evil_Wizard.switchSprite('TakeHit_left')
-            setTimeout(() => {
-                Evil_Wizard.behurt = true
-            }, 200);
-        }
-            
-        //console.log(enemy.showDead)
+        Evil_Wizard.enemy_AI(player.position, player)
+    } else {
+        Evil_Wizard.startDeathAnimation()
     }
-    else
-    {
-        if(Evil_Wizard.showDead)
-        {
-            if(Evil_Wizard.lastDirection == 'right')
-                Evil_Wizard.switchSprite('Death')
-            else
-                Evil_Wizard.switchSprite('DeathMirror')
-            setTimeout(() => {
-                Evil_Wizard.showDead = false
-            }, 680);
-        }
-    }
-    if(Evil_Wizard.showDead)
-            Evil_Wizard.update()
-    if(Wizard.HP > 0)
-    {
+    if (Evil_Wizard.showDead) Evil_Wizard.update()
+    if (Wizard.HP > 0) {
         Wizard.checkforHorizontalCanvasCollision()
-        Wizard.enemy_AI(player.position,player)
-        //检查敌人血量是否发生变化，若减少则播放受击动画
-        if(Wizard.HP < Wizard.preHP)
-        {
-            Wizard.behurt = false
-            Wizard.preHP = Wizard.HP
-        }
-        if(!Wizard.behurt)
-        {
-            if(Wizard.lastDirection == 'right')
-                Wizard.switchSprite('TakeHit_right')
-            else
-                Wizard.switchSprite('TakeHit_left')
-            setTimeout(() => {
-                Wizard.behurt = true
-            }, 200);
-        }
-
-        //console.log(enemy.showDead)
+        Wizard.enemy_AI(player.position, player)
+    } else {
+        Wizard.startDeathAnimation()
     }
-    else
-    {
-        if(Wizard.showDead)
-        {
-            if(Wizard.lastDirection == 'right')
-                Wizard.switchSprite('Death')
-            else
-                Wizard.switchSprite('DeathMirror')
-            setTimeout(() => {
-                Wizard.showDead = false
-            }, 680);
-        }
-    }
-    if(Wizard.showDead)
-        Wizard.update()   
+    if (Wizard.showDead) Wizard.update()   
     c.restore()
     /*----------------------*/
+    // Draw player HP bar as fixed HUD in screen space (outside camera transform)
+    player.healthBar.drawPlayerHUD(c)
 }
 
 registerKeyHandlers();

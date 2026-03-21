@@ -71,6 +71,14 @@ export default class Player extends Sprite {
 		this.HP = this.HP_limit;
 		this.damage = 10;
 		this.hasDamage = false;
+
+		// Combat state
+		this.isInvincible = false;
+		this.lastHitTime = 0;
+		this.invincibilityDuration = 800; // ms of i-frames after taking a hit
+		this.lastAttackTime = 0;
+		this.attackCooldown = 350;        // ms between allowed attacks
+		this.deathStarted = false;
 	}
 
 
@@ -114,59 +122,54 @@ export default class Player extends Sprite {
 	}
 
 	/**
-	 * 攻击方法
+	 * 攻击方法 — 受攻击冷却保护，每次按键只能触发一次
 	 */
 	try2Attack(i) {
-		switch(i)
-		{
-			case 0:
-				this.attack(this.damage*1)
-				break
-			case 1:
-				this.attack(this.damage*2)
-				break
-			case 2:
-				this.attack(this.damage*3)
-				break
+		const now = Date.now();
+		if (now - this.lastAttackTime < this.attackCooldown) return;
+		this.lastAttackTime = now;
+		switch (i) {
+			case 0: this.attack(this.damage * 1); break;
+			case 1: this.attack(this.damage * 2); break;
+			case 2: this.attack(this.damage * 3); break;
 		}
-		
 	}
 	//获取敌人信息
 	getEnemies(enemyList)
 	{
 		this.enemyList = enemyList
 	}
-	//判断敌人是否在攻击范围
-	isEnemyInAttackRange(enemy)
-	{
-		return Math.abs(enemy.position.x-this.position.x) <= 40
-				&& 	Math.abs(enemy.position.y-this.position.y) <=20
+	/**
+	 * 方向性攻击范围判断 — 只攻击玩家面朝方向前方的敌人
+	 */
+	isEnemyInAttackRange(enemy) {
+		const dx = enemy.position.x - this.position.x;
+		const dy = Math.abs(enemy.position.y - this.position.y);
+		if (dy > 22) return false;
+		if (this.lastDirection === 'right') return dx >= -8 && dx <= 48;
+		return dx >= -48 && dx <= 8;
 	}
+	/**
+	 * 对攻击范围内存活且不处于无敌帧的敌人造成一次伤害
+	 */
 	attack(damageValue) {
-	//插入攻击1逻辑
-	
-		//对玩家水平朝向的一定距离的实体造成伤害
-		for(let i=0;i<this.enemyList.length;i++)
-		{
-
-			if(this.isEnemyInAttackRange(this.enemyList[i]))
-			{
-				if(this.enemyList[i].HP>0 && !this.hasDamage)
-				{
-					this.hasDamage = true
-					this.enemy = this.enemyList[i]
-					if(this.enemyList[i].HP>damageValue)
-					{
-						this.enemyList[i].HP -= damageValue
-					}
-					else
-						this.enemyList[i].HP = 0
-				}
-				
+		for (let i = 0; i < this.enemyList.length; i++) {
+			if (this.isEnemyInAttackRange(this.enemyList[i])) {
+				this.enemyList[i].takeDamage(damageValue, this.lastDirection);
 			}
 		}
-		this.hasDamage = false
-		
+	}
+	/**
+	 * 受到伤害 — 带无敌帧保护和水平击退
+	 */
+	takeDamage(amount, attackerDirection) {
+		if (this.isInvincible || this.HP <= 0) return;
+		this.HP = Math.max(0, this.HP - amount);
+		this.isInvincible = true;
+		this.lastHitTime = Date.now();
+		// Horizontal knockback; flash effect from sprite.js draw() provides visual feedback
+		this.velocity.x = attackerDirection === 'right' ? 2.5 : -2.5;
+		this.velocity.y = -0.8;
 	}
 	
 	/**
@@ -192,7 +195,7 @@ export default class Player extends Sprite {
 		if (this.image === this.animations[key].image || !this.loaded) {
 			return;
 		}
-
+		this.currentFrame = 0;
 		this.image = this.animations[key].image;
 		this.frameBuffer = this.animations[key].frameBuffer;
 		this.frameRate = this.animations[key].frameRate;
@@ -289,6 +292,11 @@ export default class Player extends Sprite {
 	 * 更新方法
 	 */
 	update() {
+		// Tick down invincibility frames
+		if (this.isInvincible && Date.now() - this.lastHitTime > this.invincibilityDuration) {
+			this.isInvincible = false;
+		}
+
 		this.updateFrames();
 		this.updateHitbox();
 

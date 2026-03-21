@@ -29,6 +29,11 @@ export default class Sprite {
 	draw() {
 		if (!this.image) return;
 
+		// Flash semi-transparent during invincibility frames
+		if (this.isInvincible) {
+			c.globalAlpha = Math.floor(Date.now() / 80) % 2 === 0 ? 1.0 : 0.15;
+		}
+
 		const cropbox = {
 			position: {
 				x: this.currentFrame * (this.image.width / this.frameRate),
@@ -49,6 +54,8 @@ export default class Sprite {
 			this.width,
 			this.height
 		);
+
+		c.globalAlpha = 1.0;
 	}
 	update() {
 		this.draw();
